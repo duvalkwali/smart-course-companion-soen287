@@ -7,6 +7,7 @@ import Signup from "./pages/Signup.jsx"
 import Signin from "./pages/Signin.jsx"
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminCourse from './pages/admin/AdminCourse.jsx';
+import CourseDashboard from './pages/course/CourseDashboard.jsx';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/" element={<App/>}/>
                 <Route path="/signup" element={<Signup/>}/>
                 <Route path="/signin" element={<Signin/>}/>
+                <Route path="/course" element={<CourseDashboard/>}/>
                 <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
                 <Route path="/admin/course" element={<AdminCourse/>}/>
             </Routes>
