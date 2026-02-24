@@ -1,16 +1,25 @@
 import AdminNavBar from "../../components/admin/AdminNavbar"
-import CourseOptions from "../../components/admin/CourseOptions"
 import CourseStatus from "../../components/admin/CourseStatus"
 
 function AdminDashboard() {
 
     const courses = [
-        {code: "COMP 249", title: "Object-Oriented Programming II", term: "Winter 2026", },
-        {code: "ENGR 233", title: "Applied Advanced Calculus", term: "Winter 2026" },
-        {code: "SOEN 228", title: "System Hardware", term: "Winter 2026" },
-        {code: "SOEN 287", title: "Web Programming", term: "Winter 2026" },
-        {code: "SOEN 287", title: "Web Programming", term: "Winter 2026" },
-    ];
+        { code: "COMP 249", name: "Object-Oriented Programming II", term: "Winter 2026" },
+        { code: "ENGR 233", name: "Applied Advanced Calculus", term: "Winter 2026" },
+        { code: "SOEN 228", name: "System Hardware", term: "Winter 2026" },
+        { code: "SOEN 287", name: "Web Programming", term: "Winter 2026" },
+        { code: "SOEN 287", name: "Web Programming", term: "Winter 2026" }
+    ]
+
+    const assessments = [
+        { name: "Test 1", weight: 10 },
+        { name: "Test 2", weight: 10 },
+        { name: "Quiz 1", weight: 5 },
+        { name: "Quiz 2", weight: 5 },
+        { name: "Quiz 3", weight: 5 },
+        { name: "Midterm Exam", weight: 25 },
+        { name: "Final Exam", weight: 40 }
+    ]
     
     return (
         <>
@@ -51,23 +60,31 @@ function AdminDashboard() {
                             <input type="search" placeholder="Search courses" />
                         </label>
 
-                        
-
                         <ul className="list bg-base-100 rounded-box shadow">
-                        {courses.map((course, index) => (
-                            <li key={index} className="list-row">
-                                <CourseStatus />
-                                <div>
+                            {courses.map((course, index) => (
+                                <li key={index} className="list-row">
+                                    <CourseStatus />
                                     <div>
-                                        {course.code} - {course.title}
+                                        <div>
+                                            {course.code} - {course.name}
+                                        </div>
+                                        <div className="text-xs font-semibold opacity-60">
+                                            {course.term}
+                                        </div>
                                     </div>
-                                    <div className="text-xs font-semibold opacity-60">
-                                        {course.term}
+                                    <div className="flex flex-row ml-auto gap-1">
+                                        <button className="btn btn-square btn-ghost" onClick={()=>document.getElementById(`${course.name}_view_modal`).showModal()}>
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" alt="View" />
+                                        </button>
+                                        <button className="btn btn-square btn-ghost">
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=86373&format=png&color=000000" alt="Edit" />
+                                        </button>
+                                        <button className="btn btn-square btn-ghost">
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=99933&format=png&color=000000" alt="Delete" />
+                                        </button>
                                     </div>
-                                </div>
-                                <CourseOptions />
-                            </li>
-                        ))}
+                                </li>
+                            ))}
                         </ul>
 
                     </div>
@@ -90,6 +107,40 @@ function AdminDashboard() {
                 </div>
 
             </div>
+
+            {courses.map((course, index) => (
+                <dialog key={index} id={`${course.name}_view_modal`} className="modal">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg">{course.code} - {course.name}</h3>
+                        <p className="py-4">{course.term}</p>
+                        <p class="font-bold">Course Assessments</p>
+                        <div className="overflow-x-auto">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {assessments.map((assessment, index) => (
+                                        <tr>
+                                            <th>{index + 1}</th>
+                                            <td>{assessment.name}</td>
+                                            <td>{assessment.weight}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                    <form method="dialog" className="modal-backdrop">
+                        <button>close</button>
+                    </form>
+                </dialog>
+            ))}
         </>
 
     )

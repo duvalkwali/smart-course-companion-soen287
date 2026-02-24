@@ -25,10 +25,14 @@ function App() {
                     
                     <span className='text-2xl'>
                         Trusted by 500+ students at&nbsp;
-                        <span className="text-rotate duration-4000">
+                        <span className="text-rotate duration-6000">
                             <span>
                                 <span>Concordia University</span>
                                 <span>McGill University</span>
+                                <span>Université de Montréal</span>
+                                <span>Polytechnique Montréal</span>
+                                <span>HEC Montréal</span>
+
                             </span>
                         </span>
                     </span>
