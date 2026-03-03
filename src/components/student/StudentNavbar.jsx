@@ -1,10 +1,22 @@
 import { Link } from 'react-router-dom';
+import { getLatestUser } from "../../data/users";
 
-function StudentNavbar({ firstName = "Duval", lastName = "Kwali" }) {
+function StudentNavbar() {
 
-  const initials =
-    firstName.charAt(0).toUpperCase() +
-    lastName.charAt(0).toUpperCase();
+  let initials = "ST"; // DEFAULT fallback
+    const user = getLatestUser();
+
+  if (user && user.fullName) {
+    const parts = user.fullName.trim().split(" ");
+
+    if (parts.length >= 2) {
+      initials =
+        parts[0][0].toUpperCase() +
+        parts[1][0].toUpperCase();
+    } else if (parts.length === 1) {
+      initials = parts[0][0].toUpperCase();
+    }
+  }
 
   return (
     <>
@@ -60,9 +72,6 @@ function StudentNavbar({ firstName = "Duval", lastName = "Kwali" }) {
             <li>
               <Link to="/student/add-courses">Add Courses</Link>
             </li>
-            <li>
-              <Link to="/student/settings">Settings</Link>
-            </li> 
           </ul>
         </div>
         <Link to="/">Sign Out</Link>
