@@ -1,5 +1,6 @@
 import AdminNavBar from "../../components/admin/AdminNavbar"
 import CourseStatus from "../../components/admin/CourseStatus"
+import { Fragment } from 'react';
 
 function AdminDashboard() {
 
@@ -76,7 +77,7 @@ function AdminDashboard() {
                                         <button className="btn btn-square btn-ghost" onClick={()=>document.getElementById(`${course.name}_view_modal`).showModal()}>
                                             <img className="w-5" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" alt="View" />
                                         </button>
-                                        <button className="btn btn-square btn-ghost">
+                                        <button className="btn btn-square btn-ghost" onClick={()=>document.getElementById(`${course.name}_edit_modal`).showModal()}>
                                             <img className="w-5" src="https://img.icons8.com/?size=100&id=86373&format=png&color=000000" alt="Edit" />
                                         </button>
                                         <button className="btn btn-square btn-ghost">
@@ -109,37 +110,95 @@ function AdminDashboard() {
             </div>
 
             {courses.map((course, index) => (
-                <dialog key={index} id={`${course.name}_view_modal`} className="modal">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-lg">{course.code} - {course.name}</h3>
-                        <p className="py-4">{course.term}</p>
-                        <p class="font-bold">Course Assessments</p>
-                        <div className="overflow-x-auto">
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Name</th>
-                                        <th>Weight</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {assessments.map((assessment, index) => (
+                <Fragment key={index}>
+                    <dialog id={`${course.name}_view_modal`} className="modal">
+                        <div className="modal-box">
+                            <h3 className="font-bold text-lg">{course.code} - {course.name}</h3>
+                            <p className="py-4">{course.term}</p>
+                            <div className="stats shadow">
+                                <div className="stat">
+                                    <div className="stat-figure">
+                                        <img src="https://img.icons8.com/?size=100&id=85057&format=png&color=000000" alt="Group" className="w-10" />
+                                    </div>
+                                    <div className="stat-title">Students</div>
+                                    <div className="stat-value">123</div>
+                                </div>
+                                <div className="stat">
+                                    <div className="stat-figure">
+                                        <img src="https://img.icons8.com/?size=100&id=82464&format=png&color=000000" alt="Book" className="w-10" />
+                                    </div>
+                                    <div className="stat-title">Assessments Complete</div>
+                                    <div className="stat-value">76%</div>
+                                </div>
+                            </div>
+                            <p class="font-bold mt-5">Course Assessments</p>
+                            <div className="overflow-x-auto">
+                                <table className="table">
+                                    <thead>
                                         <tr>
-                                            <th>{index + 1}</th>
-                                            <td>{assessment.name}</td>
-                                            <td>{assessment.weight}%</td>
+                                            <th></th>
+                                            <th>Name</th>
+                                            <th>Weight</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {assessments.map((assessment, index) => (
+                                            <tr>
+                                                <th>{index + 1}</th>
+                                                <td>{assessment.name}</td>
+                                                <td>{assessment.weight}%</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         </div>
-                        
-                    </div>
-                    <form method="dialog" className="modal-backdrop">
-                        <button>close</button>
-                    </form>
-                </dialog>
+                        <form method="dialog" className="modal-backdrop">
+                            <button>close</button>
+                        </form>
+                    </dialog>
+                    <dialog id={`${course.name}_edit_modal`} className="modal">
+                        <div className="modal-box">
+                            <h3 className="font-bold text-lg">{course.code} - {course.name}</h3>
+                            <p className="py-4">{course.term}</p>
+                            <p class="font-bold">Edit Course Assessments</p>
+                            <div className="overflow-x-auto">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Name</th>
+                                            <th>Weight</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {assessments.map((assessment, index) => (
+                                            <tr>
+                                                <th>{index + 1}</th>
+                                                <td><input type="text" className="input" value={assessment.name}/></td>
+                                                <td><input type="number" className="input" value={assessment.weight}/></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <form method="dialog">
+                                    <div className="flex flex-row justify-between">
+                                    <   button className="btn btn-outline btn-neutral">Cancel</button>
+                                        <button className="btn btn-neutral">Save Changes</button>
+                                    </div>
+                                </form>
+                                
+
+                            </div>
+                            
+                        </div>
+                        <form method="dialog" className="modal-backdrop">
+                            <button>close</button>
+                        </form>
+                    </dialog>
+                </Fragment>
+                
             ))}
         </>
 
