@@ -1,58 +1,375 @@
 import StudentNavbar from "../../components/student/StudentNavbar.jsx"
-import CourseCard from "../../components/student/CourseCard.jsx"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function StudentDashboard() {
-  const courses = [
-    {
-      id: 1,
-      title: "Web Development",
-      description: "Learn React, Node, and Full Stack Development",
-      image: "https://miro.medium.com/1*V-Jp13LvtVc2IiY2fp4qYw.jpeg"
-    },
-    {
-      id: 2,
-      title: "Machine Learning",
-      description: "Supervised & Unsupervised learning concepts",
-      image: "https://www.trentonsystems.com/hs-fs/hubfs/Machine_Learning%20.jpeg?width=8082&name=Machine_Learning%20.jpeg"
-    },
-    {
-      id: 3,
-      title: "Data Structures",
-      description: "Master arrays, trees, graphs and algorithms",
-      image: "https://miro.medium.com/v2/resize:fit:1200/1*-_J_BprW1eqly16pHAIgdw.jpeg"
-    },
-    {
-      id: 4,
-      title: "Game Development with Unity",
-      description: "Learn how to create games using the Unity engine",
-      image: "https://dotnet.microsoft.com/blob-assets/images/illustrations/unity/unity-engine-landscape-swimlane.png"
+    const navigate = useNavigate()
+    const [user, setUser] = useState(null);
+    const [enabledCourses, setEnabledCourses] = useState([])
+    const [enrollments, setEnrollments] = useState([])
+    const [selectedEnrollment, setSelectedEnrollment] = useState(null)
+    const [selectedEnrollmentAssessments, setSelectedEnrollmentAssessments] = useState([])
+    const [upcomingAssessments, setUpcomingAssessments] = useState([])
+    const [courseAverages, setCourseAverages] = useState({})
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"))
+        if (!storedUser) navigate("/auth/signin")
+        else if (storedUser.role != "Student") navigate("/admin/dashboard")
+        else setUser(storedUser)
+
+        fetch("http://localhost:3001/enabled-courses")
+            .then(res => res.json())
+            .then(data => setEnabledCourses(data))
+    }, [])
+
+    useEffect(() => {
+        if (!user) return
+        fetch("http://localhost:3001/user-enrollments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setEnrollments(data))
+        
+        fetch("http://localhost:3001/student-upcoming-assessments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setUpcomingAssessments(data))
+        fetch("http://localhost:3001/all-course-averages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setCourseAverages(data))
+    }, [user])
+
+    const handleEnroll = async (course_id) => {
+        await fetch("http://localhost:3001/enroll", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id, course_id })
+        })
+        const enrolledCourse = enabledCourses.find(c => c.id === course_id)
+        setEnrollments([...enrollments, enrolledCourse].sort((a, b) => a.id - b.id))
+
+        fetch("http://localhost:3001/student-upcoming-assessments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setUpcomingAssessments(data))
+
+        fetch("http://localhost:3001/all-course-averages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setCourseAverages(data))
     }
- 
-  ]
 
-  return (
-    <>
-        <StudentNavbar></StudentNavbar>
-      <div className="w-full pt-24">
-        <div className=" flex justify-center">
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">    
-      
-        {/* Put your CourseCard components here */}
-      
-          {courses.map((course) => (
-            <CourseCard
-              key={course.id}
-              title={course.title}
-              description={course.description}
-              image={course.image}
-            />
-          ))}
+    const handleUnenroll = async (course_id) => {
+        await fetch("http://localhost:3001/unenroll", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id, course_id })
+        })
+        setEnrollments(enrollments.filter(e => e.id !== course_id))
 
-      </div>
-    </div>
-      </div>  
-    </>
-  )
+        fetch("http://localhost:3001/student-upcoming-assessments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setUpcomingAssessments(data))
+
+        document.getElementById("enrollment_modal").close()
+    }
+
+    const openEnrollmentModal = async (enrollment) => {
+        setSelectedEnrollment(enrollment)
+        const res = await fetch("http://localhost:3001/student-assessments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id, course_id: enrollment.id })
+        })
+        const data = await res.json()
+        setSelectedEnrollmentAssessments(data)
+        document.getElementById("enrollment_modal").showModal()
+    }
+
+    const handleSaveMark = async (assessment) => {
+        await fetch("http://localhost:3001/save-mark", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: user.id,
+                assessment_id: assessment.id,
+                earned: assessment.earned,
+                total: assessment.total,
+                status: assessment.status ?? "Pending"
+            })
+        })
+
+        fetch("http://localhost:3001/student-upcoming-assessments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setUpcomingAssessments(data))
+
+        fetch("http://localhost:3001/all-course-averages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setCourseAverages(data))
+    }
+
+    const handleSaveAllMarks = async () => {
+        for (const assessment of selectedEnrollmentAssessments) {
+            await fetch("http://localhost:3001/save-mark", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    assessment_id: assessment.id,
+                    earned: assessment.earned,
+                    total: assessment.total,
+                    status: assessment.status ?? "Pending"
+                })
+            })
+        }
+        
+        fetch("http://localhost:3001/student-upcoming-assessments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: user.id })
+            })
+                .then(res => res.json())
+                .then(data => setUpcomingAssessments(data))
+
+            fetch("http://localhost:3001/all-course-averages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: user.id })
+            })
+                .then(res => res.json())
+                .then(data => setCourseAverages(data))
+
+        document.getElementById("enrollment_modal").close()
+    }
+
+    return (
+        <>
+            <StudentNavbar />
+
+            <div className="flex flex-col items-center gap-10 p-10"> 
+                <p className="text-4xl font-bold">Hey, {user?.name.split(" ")[0]}!</p>
+
+
+                <div className="tabs tabs-lift w-2/3 flex flex-row justify-center">
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Course List" defaultChecked />
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+
+                        {enrollments.length == 0 ? (
+                            <ul className="list bg-base-100 rounded-box shadow">
+                                <li className="list-row">
+                                    <div className="text-xs font-semibold opacity-60">No courses to display.</div>
+                                </li>
+                            </ul>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                                {enrollments.map((enrollment, index) => (
+                                        <div key={index} className="card bg-base-100 w-96 shadow-sm">
+                                            <div className="card-body">
+                                                <h2 className="card-title">{enrollment.code} - {enrollment.name}</h2>
+                                                <p className="text-sm font-bold">
+                                                    Average: {courseAverages[enrollment.id] ? `${courseAverages[enrollment.id]}%` : "N/A"}
+                                                </p>
+                                                <p>{enrollment.term} - {enrollment.instructor}</p>
+                                                <div className="card-actions justify-end">
+                                                    <button className="btn btn-square" onClick={() => openEnrollmentModal(enrollment)}>
+                                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=98028&format=png&color=000000" alt="Expand" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        )}
+
+
+                    </div>
+
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Enrollment" />
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <fieldset className="fieldset w-full"><legend className="fieldset-legend">Available Courses</legend></fieldset>
+
+                        <ul className="list bg-base-100 rounded-box shadow">
+
+                            {enabledCourses.filter(c => !enrollments.some(e => e.id == c.id)).length == 0 ? (
+
+                                <li className="list-row">
+                                    <div className="text-xs font-semibold opacity-60">No courses to display.</div>
+                                </li>
+
+                            ) : enabledCourses.filter(c => !enrollments.some(e => e.id == c.id)).map((course, index) => (
+                                    <li key={index} className="list-row">
+                                        <div>
+                                            <div>{course.code} - {course.name}</div>
+                                            <div className="text-xs font-semibold opacity-60">{course.term} - {course.instructor}</div>
+                                        </div>
+                                        <div className="flex flex-row ml-auto gap-1">
+                                            <button className="btn btn-square btn-ghost" onClick={() => handleEnroll(course.id)}>
+                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Enroll" />
+                                            </button>
+                                        </div>
+                                    </li>
+                                )
+                            )}
+                        </ul>
+                        
+                    </div>
+
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Upcoming Assessments" />
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <fieldset className="fieldset w-full"><legend className="fieldset-legend">Upcoming Assessments</legend></fieldset>
+
+                        <ul className="list bg-base-100 rounded-box shadow">
+
+                            {upcomingAssessments.length == 0 ? (
+                                <li className="list-row">
+                                    <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
+                                </li>
+                            ) : upcomingAssessments.map((assessment, index) => (
+                                    <li key={index} className="list-row">
+                                        <div>
+                                            <div>{assessment.name}</div>
+                                            <div className="text-xs font-semibold opacity-60">{assessment.course_code} - {assessment.course_name} - {assessment.weight}% - Due {assessment.due_date}</div>
+
+                                        </div>
+                                        <div className="flex flex-row ml-auto gap-1">
+                                            <button className="btn btn-square btn-ghost" onClick={() => handleSaveMark({ ...assessment, status: "Complete" })}>
+                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Complete" />
+                                            </button>
+                                        </div>
+                                    </li>
+                                )
+                            )}
+                        </ul>
+                        
+                    </div>
+                </div>
+
+                
+
+            </div>
+                            
+
+            <dialog id="enrollment_modal" className="modal">
+                <div className="modal-box max-h-8/10 max-w-8/10">
+                    {selectedEnrollment && (
+                        <>
+                            <h3 className="font-bold text-lg">{selectedEnrollment.code} - {selectedEnrollment.name}</h3>
+                            <p className="text-sm opacity-60 mb-4">{selectedEnrollment.term} - {selectedEnrollment.instructor}</p>
+
+                            <ul className="list bg-base-100 rounded-box shadow overflow-y-auto max-h-80">
+                                {selectedEnrollmentAssessments.length == 0 ? (
+                                    <li className="list-row">
+                                        <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
+                                    </li>
+
+                                ) : selectedEnrollmentAssessments.map((assessment, index) => (
+                                        <li key={index} className="list-row">
+                                            <div>
+                                                <div>{assessment.name}</div>
+                                                <div className="text-xs font-semibold opacity-60">{assessment.weight}% - {assessment.due_date}</div>
+                                            </div>
+
+                                            <div className="flex flex-row gap-2">
+                                                <select 
+                                                    className="select" 
+                                                    value={assessment.status ?? "Pending"}  
+                                                    onChange={e => {
+                                                        const updated = [...selectedEnrollmentAssessments]
+                                                        if (e.target.value == "Pending") {
+                                                            updated[index] = { ...assessment, status: "Pending", earned: null, total: null }
+                                                        } else {
+                                                            updated[index] = { ...assessment, status: e.target.value }
+                                                        }
+                                                        setSelectedEnrollmentAssessments(updated)
+                                                    }}
+                                                >
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Complete">Complete</option>
+                                                </select>
+                                                {assessment.status == "Complete" && (
+                                                    <>
+                                                        <input
+                                                            type="number"
+                                                            className="input"
+                                                            placeholder="Earned"
+                                                            value={assessment.earned ?? ""}
+                                                            onChange={e => {
+                                                                const updated = [...selectedEnrollmentAssessments]
+                                                                updated[index] = { ...assessment, earned: e.target.value }
+                                                                setSelectedEnrollmentAssessments(updated)
+                                                            }}
+                                                        />
+                                                        <input
+                                                            type="number"
+                                                            className="input"
+                                                            placeholder="Total"
+                                                            value={assessment.total ?? ""}
+                                                            onChange={e => {
+                                                                const updated = [...selectedEnrollmentAssessments]
+                                                                updated[index] = { ...assessment, total: e.target.value }
+                                                                setSelectedEnrollmentAssessments(updated)
+                                                            }}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+
+                                        </li>
+                                    )
+                                )}
+                            </ul>
+
+                            <div className="modal-action">
+                                <button className="btn btn-square mr-auto" onClick={() => handleUnenroll(selectedEnrollment.id)}>
+                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=3C7IH9dQArFF&format=png&color=000000" alt="Exit" />
+
+                                </button>
+                                <form method="dialog">
+                                    <button className="btn btn-square">
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                                    </button>                                </form>
+                                <button className="btn btn-square" onClick={handleSaveAllMarks}>
+                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </dialog>
+
+
+
+        </>
+    )
 }
 
 export default StudentDashboard

@@ -1,24 +1,31 @@
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 
-function AdminNavBar() {
-  return (
-    <>
-        <div className="navbar bg-base-100 shadow-sm">
-                <div className="navbar-start">
-                    <a className="btn btn-ghost text-xl">Admin Dashboard</a>
-                </div>
-                <div className="navbar-center">
-                    <ul className="menu menu-horizontal px-1">
-                        {/* <li><a>Admins</a></li> */}
-                        {/* <li><a>Students</a></li> */}
-                    </ul>
-                </div>
-                <div className="navbar-end">
-                        <Link className='btn btn-link' to="/">Sign Out</Link>
-                </div>
-        </div>
-    </>
-  )
+function AdminNavbar() {
+    const navigate = useNavigate();
+
+    const handleSignOut = () => {
+        localStorage.removeItem("user");
+        navigate("/");
+    }
+    return (
+        <>
+            <div className="navbar bg-base-100 shadow-sm">
+                    <div className="navbar-start">
+                        <a className="btn btn-ghost text-xl">Admin Dashboard</a>
+                    </div>
+                    <div className="navbar-center">
+                        <ul className="menu menu-horizontal px-1">
+                            {/* <li><a>Admins</a></li> */}
+                            {/* <li><a>Students</a></li> */}
+                        </ul>
+                    </div>
+                    <div className="navbar-end">
+                        <button className='btn btn-link' onClick={handleSignOut}>Sign Out</button>
+                    </div>
+            </div>
+        </>
+    )
 }
 
-export default AdminNavBar
+export default AdminNavbar
