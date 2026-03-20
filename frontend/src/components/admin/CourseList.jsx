@@ -7,6 +7,8 @@ function CourseList({ courses, setCourses }) {
     const [assessmentName, setAssessmentName] = useState("")
     const [assessmentWeight, setAssessmentWeight] = useState("")
     const [assessmentDueDate, setAssessmentDueDate] = useState("")
+    const [assessmentCategory, setAssessmentCategory] = useState("")
+    const [assessmentDescription, setAssessmentDescription] = useState("")
 
     const handleEditCourse = async () => {
         await fetch("http://localhost:3001/edit-course", {
@@ -52,6 +54,8 @@ function CourseList({ courses, setCourses }) {
         const data = await res.json()
         setAssessments([...assessments, { id: data.id, course_id: selectedCourse.id, name: assessmentName, weight: assessmentWeight, due_date: assessmentDueDate }])
         setAssessmentName("")
+        setAssessmentCategory("Assignment")
+        setAssessmentDescription("")
         setAssessmentWeight("")
         setAssessmentDueDate("")
     }
@@ -167,10 +171,22 @@ function CourseList({ courses, setCourses }) {
                                     <label className="label">Name</label>
                                     <input type="text" className="input w-full" placeholder="Midterm Exam" value={assessmentName} onChange={e => setAssessmentName(e.target.value)} />
 
+                                    <label className="label">Category</label>
+                                    <select className="select w-full" value={assessmentCategory} onChange={e => setAssessmentCategory(e.target.value)}>
+                                        <option value="Assignment">Assignment</option>
+                                        <option value="Exam">Exam</option>
+                                        <option value="Lab">Lab</option>
+                                        <option value="Quiz">Quiz</option>
+                                        <option value="Project">Project</option>
+                                    </select>
+
+                                    <label className="label">Description (optional)</label>
+                                    <input type="text" className="input w-full" placeholder="" value={assessmentDescription} onChange={e => setAssessmentDescription(e.target.value)} />
+
                                     <label className="label">Weight (%)</label>
                                     <input type="number" className="input w-full" placeholder="25" value={assessmentWeight} onChange={e => setAssessmentWeight(e.target.value)} />
 
-                                    <label className="label">Due Date</label>
+                                    <label className="label">Due Date (optional)</label>
                                     <input type="date" className="input w-full" value={assessmentDueDate} onChange={e => setAssessmentDueDate(e.target.value)} />
 
                                     <button className="btn btn-square mt-4" onClick={handleAddAssessment}>

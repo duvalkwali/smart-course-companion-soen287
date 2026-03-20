@@ -35,6 +35,8 @@ db.exec(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         course_id INTEGER NOT NULL,
         name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT,
         weight REAL NOT NULL,
         due_date TEXT,
         FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
@@ -92,6 +94,12 @@ app.post("/signin", (req, res) => {
     res.json(result)
 })
 
+app.post("/edit-user", (req, res) => {
+    const { id, name, email, password } = req.body
+    const result = db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, password, id)
+    res.json(result)
+})
+
 app.get("/courses", (req, res) => {
     const get_all_courses = db.prepare("SELECT * FROM courses")
     const result = get_all_courses.all()
@@ -139,9 +147,9 @@ app.post("/course-assessments", (req, res) => {
 })
 
 app.post("/add-assessment", (req, res) => {
-    const { course_id, name, weight, due_date } = req.body
-    const insert_assessment = db.prepare("INSERT INTO assessments (course_id, name, weight, due_date) VALUES (?, ?, ?, ?)")
-    const result = insert_assessment.run(course_id, name, weight, due_date)
+    const { course_id, name, category, description, weight, due_date } = req.body
+    const insert_assessment = db.prepare("INSERT INTO assessments (course_id, name, category, description, weight, due_date) VALUES (?, ?, ?, ?, ?, ?)")
+    const result = insert_assessment.run(course_id, name, category, description, weight, due_date)
     res.json({ id: result.lastInsertRowid })
 })
 
