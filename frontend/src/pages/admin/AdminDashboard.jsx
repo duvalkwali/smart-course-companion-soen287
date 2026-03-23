@@ -24,8 +24,8 @@ function AdminDashboard() {
             .then(res => res.json())
             .then(data => setCourses(data))
         fetch("http://localhost:3001/admin-course-statistics")
-        .then(res => res.json())
-        .then(data => setStatistics(data))
+            .then(res => res.json())
+            .then(data => setStatistics(data))
     }, [])
 
     return (
@@ -43,36 +43,6 @@ function AdminDashboard() {
                     <input type="radio" name="my_tabs_3" className="tab" aria-label="Add Course" />
                     <div className="tab-content bg-base-100 border-base-300 p-6">
                         <AddCourse courses={courses} setCourses={setCourses} />
-                    </div>
-                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Statistics" />
-                    <div className="tab-content bg-base-100 border-base-300 p-6">
-                        <ul className="list bg-base-100 rounded-box shadow">
-                            {statistics.length == 0 ? (
-                                <li className="list-row">
-                                    <div className="text-xs font-semibold opacity-60">No statistics to display.</div>
-                                </li>
-                            ) : statistics.map((course, index) => (
-                                <li key={index} className="list-row flex-col items-start gap-2">
-                                    <div className="w-full">
-                                        <div className="font-bold">{course.code} - {course.name}</div>
-                                        <div className="text-xs opacity-60">{course.enrolled} students enrolled</div>
-                                    </div>
-                                    {course.assessments.map((assessment, i) => (
-                                        <div key={i} className="w-full">
-                                            <div className="flex justify-between text-xs opacity-60 mb-1">
-                                                <span>{assessment.name}</span>
-                                                <span>{assessment.completed}/{assessment.enrolled} complete</span>
-                                            </div>
-                                            <progress
-                                                className="progress progress-primary w-full"
-                                                value={assessment.completed}
-                                                max={assessment.enrolled || 1}
-                                            />
-                                        </div>
-                                    ))}
-                                </li>
-                            ))}
-                        </ul>
                     </div>
                 </div>
             </div>

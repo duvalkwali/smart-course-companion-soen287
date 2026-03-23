@@ -2,6 +2,18 @@ import { useState } from "react"
 
 function CourseList({ courses, setCourses }) {
     const [selectedCourse, setSelectedCourse] = useState(null)
+    const [selectedCourseStats, setSelectedCourseStats] = useState(null)
+
+    const openStatsModal = async (course) => {
+        const res = await fetch("http://localhost:3001/course-statistics", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ course_id: course.id })
+        })
+        const data = await res.json()
+        setSelectedCourseStats(data)
+        document.getElementById("course_stats_modal").showModal()
+    }
 
     const [assessments, setAssessments] = useState([])
     const [assessmentName, setAssessmentName] = useState("")
@@ -11,6 +23,11 @@ function CourseList({ courses, setCourses }) {
     const [assessmentDescription, setAssessmentDescription] = useState("")
 
     const handleEditCourse = async () => {
+
+        if (!selectedCourse.name || !selectedCourse.code || !selectedCourse.instructor || !selectedCourse.term) {
+            alert("All fields are required")
+            return
+        }
         await fetch("http://localhost:3001/edit-course", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -46,13 +63,36 @@ function CourseList({ courses, setCourses }) {
     }
 
     const handleAddAssessment = async () => {
+        if (!assessmentName || !assessmentCategory || !assessmentWeight) {
+            alert("Name, category, and weight are required")
+            return
+        }
+        if (isNaN(assessmentWeight) || assessmentWeight <= 0 || assessmentWeight > 100) {
+            alert("Invalid weight")
+            return
+        }
         const res = await fetch("http://localhost:3001/add-assessment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ course_id: selectedCourse.id, name: assessmentName, weight: assessmentWeight, due_date: assessmentDueDate })
+            body: JSON.stringify({ 
+                course_id: selectedCourse.id, 
+                name: assessmentName, 
+                category: assessmentCategory, 
+                description: assessmentDescription, 
+                weight: assessmentWeight, 
+                due_date: assessmentDueDate 
+            })
         })
         const data = await res.json()
-        setAssessments([...assessments, { id: data.id, course_id: selectedCourse.id, name: assessmentName, weight: assessmentWeight, due_date: assessmentDueDate }])
+        setAssessments([...assessments, { 
+            id: data.id, 
+            course_id: selectedCourse.id, 
+            name: assessmentName, 
+            category: assessmentCategory,
+            description: assessmentDescription,
+            weight: assessmentWeight, 
+            due_date: assessmentDueDate 
+        }])
         setAssessmentName("")
         setAssessmentCategory("Assignment")
         setAssessmentDescription("")
@@ -106,6 +146,9 @@ function CourseList({ courses, setCourses }) {
                                 <div className="text-xs font-semibold opacity-60">{course.term} - {course.instructor}</div>
                             </div>
                             <div className="flex flex-row ml-auto gap-1">
+                                <button className="btn btn-square btn-ghost" onClick={() => openStatsModal(course)}>
+                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" alt="View" />
+                                </button>
                                 <button className="btn btn-square btn-ghost" onClick={() => openCourseModal(course)}>
                                     <img className="w-5" src="https://img.icons8.com/?size=100&id=86373&format=png&color=000000" alt="Edit" />
                                 </button>
@@ -213,6 +256,48 @@ function CourseList({ courses, setCourses }) {
                         </button>
 
                     </div>
+                </div>
+            </dialog>
+
+            <dialog id="course_stats_modal" className="modal">
+                <div className="modal-box">
+                    {selectedCourseStats && (
+                        <>
+                            <h3 className="font-bold text-lg">{selectedCourseStats.code} - {selectedCourseStats.name}</h3>
+                            <p className="text-sm opacity-60 mb-1">{selectedCourseStats.term} - {selectedCourseStats.instructor}</p>
+                            <p className="py-4">{selectedCourseStats.enrolled} students enrolled</p>
+
+
+                            <ul className="list bg-base-100 rounded-box shadow">
+                                {selectedCourseStats.assessments.length == 0 ? (
+                                    <li className="list-row">
+                                        <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
+                                    </li>
+                                ) : selectedCourseStats.assessments.map((assessment, index) => (
+                                    <li key={index} className="list-row">
+                                            <div>
+                                                <div>{assessment.name}</div>
+                                                <div className="text-xs font-semibold opacity-60">{assessment.category} - {assessment.weight}%</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xs text-right">{assessment.completed}/{assessment.enrolled} complete</div>
+                                                <progress
+                                                    className="progress w-full"
+                                                    value={assessment.completed}
+                                                    max={assessment.enrolled || 1}
+                                                />
+                                            </div>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <div className="modal-action">
+                                <form method="dialog">
+                                    <button className="btn">Close</button>
+                                </form>
+                            </div>
+                        </>
+                    )}
                 </div>
             </dialog>
         </>

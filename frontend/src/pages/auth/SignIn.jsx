@@ -6,13 +6,26 @@ function SignIn() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     const handleSignIn = async () => {
+        if (!email || !password) {
+            alert("All fields are required")
+            return
+        }
+        if (!emailRegex.test(email)) {
+            alert("Invalid email")
+            return
+        }
         const res = await fetch("http://localhost:3001/signin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         })
         const data = await res.json()
+        if (!res.ok) {
+            alert(data.error)
+            return
+        }
         localStorage.setItem("user", JSON.stringify(data))
 
         if (data.role == "Student") navigate("/student/dashboard")

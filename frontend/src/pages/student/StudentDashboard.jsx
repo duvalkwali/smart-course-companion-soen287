@@ -94,6 +94,14 @@ function StudentDashboard() {
             .then(res => res.json())
             .then(data => setUpcomingAssessments(data))
 
+        fetch("http://localhost:3001/all-course-averages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setCourseAverages(data))
+
         document.getElementById("enrollment_modal").close()
     }
 
@@ -129,7 +137,6 @@ function StudentDashboard() {
         })
             .then(res => res.json())
             .then(data => setUpcomingAssessments(data))
-
         fetch("http://localhost:3001/all-course-averages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -141,6 +148,26 @@ function StudentDashboard() {
 
     const handleSaveAllMarks = async () => {
         for (const assessment of selectedEnrollmentAssessments) {
+
+            if (assessment.earned && assessment.total) {
+                if (parseFloat(assessment.earned) > parseFloat(assessment.total)) {
+                    alert(`Invalid earned for ${assessment.name}`)
+                    return
+                }
+                if (parseFloat(assessment.total) <= 0) {
+                    alert(`Invalid total for ${assessment.name}`)
+                    return
+                }
+            }
+            if (assessment.earned && !assessment.total) {
+                alert(`Invalid total for ${assessment.name}`)
+                return
+            }
+            if (!assessment.earned && assessment.total) {
+                alert(`Invalid earned for ${assessment.name}`)
+                return
+            }
+
             await fetch("http://localhost:3001/save-mark", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -155,20 +182,20 @@ function StudentDashboard() {
         }
         
         fetch("http://localhost:3001/student-upcoming-assessments", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: user.id })
-            })
-                .then(res => res.json())
-                .then(data => setUpcomingAssessments(data))
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setUpcomingAssessments(data))
 
-            fetch("http://localhost:3001/all-course-averages", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: user.id })
-            })
-                .then(res => res.json())
-                .then(data => setCourseAverages(data))
+        fetch("http://localhost:3001/all-course-averages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        })
+            .then(res => res.json())
+            .then(data => setCourseAverages(data))
 
         document.getElementById("enrollment_modal").close()
     }
@@ -360,12 +387,12 @@ function StudentDashboard() {
                             <div className="modal-action">
                                 <button className="btn btn-square mr-auto" onClick={() => handleUnenroll(selectedEnrollment.id)}>
                                     <img className="w-5" src="https://img.icons8.com/?size=100&id=3C7IH9dQArFF&format=png&color=000000" alt="Exit" />
-
                                 </button>
                                 <form method="dialog">
                                     <button className="btn btn-square">
                                         <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
-                                    </button>                                </form>
+                                    </button>                                
+                                </form>
                                 <button className="btn btn-square" onClick={handleSaveAllMarks}>
                                     <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
                                 </button>

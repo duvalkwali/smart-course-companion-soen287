@@ -80,8 +80,12 @@ app.get("/students", (req, res) => {
     res.json(result)
 })
 
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
 app.post("/signup", (req, res) => {
     const { name, email, password, role } = req.body
+    if (!name || !email || !password || !role) return res.status(400).json({ error: "All fields are required" })
+    if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
     const insert_user = db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)")
     const result = insert_user.run(name, email, password, role)
     res.json({ id: result.lastInsertRowid, name, email, role })
@@ -89,13 +93,18 @@ app.post("/signup", (req, res) => {
 
 app.post("/signin", (req, res) => {
     const { email, password } = req.body
+    if (!email || !password) return res.status(400).json({ error: "All fields are required" })
+    if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
     const select_user = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?")
     const result = select_user.get(email, password)
+    if (!result) return res.status(401).json({ error: "Invalid email or password" })
     res.json(result)
 })
 
 app.post("/edit-user", (req, res) => {
     const { id, name, email, password } = req.body
+    if (!name || !email) return res.status(400).json({ error: "Name and email are required" })
+    if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
     if (password && password !== "") {
         db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, password, id)
     } else {
@@ -112,6 +121,7 @@ app.get("/courses", (req, res) => {
 
 app.post("/add-course", (req, res) => {
     const { name, code, instructor, term } = req.body
+    if (!name || !code || !instructor || !term) return res.status(400).json({ error: "All fields are required" })
     const insert_course = db.prepare("INSERT INTO courses (name, code, instructor, term) VALUES (?, ?, ?, ?)")
     const result = insert_course.run(name, code, instructor, term)
     res.json(result)
@@ -119,6 +129,7 @@ app.post("/add-course", (req, res) => {
 
 app.post("/edit-course", (req, res) => {
     const { id, name, code, instructor, term } = req.body
+    if (!name || !code || !instructor || !term) return res.status(400).json({ error: "All fields are required" })
     const update_course = db.prepare("UPDATE courses SET name = ?, code = ?, instructor = ?, term = ? WHERE id = ?");
     const result = update_course.run(name, code, instructor, term, id);
     res.json(result);
@@ -152,6 +163,9 @@ app.post("/course-assessments", (req, res) => {
 
 app.post("/add-assessment", (req, res) => {
     const { course_id, name, category, description, weight, due_date } = req.body
+    if (!name || !category || !weight) return res.status(400).json({ error: "Name, category, and weight are required" })
+    if (isNaN(weight) || weight <= 0 || weight > 100) return res.status(400).json({ error: "Invalid weight" })
+
     const insert_assessment = db.prepare("INSERT INTO assessments (course_id, name, category, description, weight, due_date) VALUES (?, ?, ?, ?, ?, ?)")
     const result = insert_assessment.run(course_id, name, category, description, weight, due_date)
     res.json({ id: result.lastInsertRowid })
@@ -212,6 +226,13 @@ app.post("/student-assessments", (req, res) => {
 
 app.post("/save-mark", (req, res) => {
     const { user_id, assessment_id, earned, total, status } = req.body
+    if (earned && total) {
+        if (parseFloat(earned) > parseFloat(total)) return res.status(400).json({ error: "Invalid earned" })
+        if (parseFloat(total) <= 0) return res.status(400).json({ error: "Invalid total" })
+    }
+    if (earned && !total) return res.status(400).json({ error: "Invalid total" })
+    if (!earned && total) return res.status(400).json({ error: "Invalid earned" })
+
     const upsert_mark = db.prepare(`
         INSERT INTO marks (user_id, assessment_id, earned, total, status)
         VALUES (?, ?, ?, ?, ?)
@@ -278,10 +299,6 @@ app.post("/all-course-averages", (req, res) => {
     res.json(averages)
 })
 
-app.listen(3001, () => {
-    console.log("Server running on http://localhost:3001")
-})
-
 app.get("/admin-course-statistics", (req, res) => {
     const courses = db.prepare("SELECT * FROM courses").all()
 
@@ -309,4 +326,23 @@ app.get("/admin-course-statistics", (req, res) => {
     })
 
     res.json(result)
+})
+
+app.post("/course-statistics", (req, res) => {
+    const { course_id } = req.body
+    const course = db.prepare("SELECT * FROM courses WHERE id = ?").get(course_id)
+    const enrolled = db.prepare("SELECT COUNT(*) as count FROM enrollments WHERE course_id = ?").get(course_id)
+    const assessments = db.prepare("SELECT * FROM assessments WHERE course_id = ?").all(course_id)
+
+    const assessments_with_completion = assessments.map(assessment => {
+        const completed = db.prepare("SELECT COUNT(*) as count FROM marks WHERE assessment_id = ? AND status = 'Complete'").get(assessment.id)
+        return { ...assessment, completed: completed.count, enrolled: enrolled.count }
+    })
+
+    res.json({ ...course, enrolled: enrolled.count, assessments: assessments_with_completion })
+})
+
+
+app.listen(3001, () => {
+    console.log("Server running on http://localhost:3001")
 })
