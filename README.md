@@ -1,238 +1,233 @@
-# Smart Course Companion — Project Documentation
+# Smart Course Companion
+
+**Smart Course Companion** is a full-stack web application for university students and administrators to manage courses, track grades, and monitor academic progress throughout the semester.
+
+---
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
 2. [Tech Stack](#tech-stack)
 3. [Project Structure](#project-structure)
-4. [Installation & Setup](#installation--setup)
+4. [Getting Started](#getting-started)
 5. [Database Schema](#database-schema)
-6. [API Reference](#api-reference)
-7. [Frontend Architecture](#frontend-architecture)
-8. [Pages & Components](#pages--components)
-9. [Feature Walkthrough](#feature-walkthrough)
-10. [Data Flow](#data-flow)
-11. [Seed Data](#seed-data)
-12. [Known Limitations & Future Plans](#known-limitations--future-plans)
+6. [Backend API Reference](#backend-api-reference)
+7. [Frontend Pages & Components](#frontend-pages--components)
+8. [User Roles](#user-roles)
+9. [Features](#features)
+10. [Seed Data](#seed-data)
 
 ---
 
 ## Project Overview
 
-**Smart Course Companion** is a full-stack web application designed for university students and administrators to manage courses and track academic assessments. Students can enroll in courses, log grades, and monitor upcoming deadlines, while admins can manage the course catalog and view completion statistics.
+Smart Course Companion provides two distinct experiences:
 
-> "Master Your Semester, One Assessment at a Time."
-
-The application currently supports Montreal-area universities including Concordia, McGill, Université de Montréal, Polytechnique Montréal, and HEC Montréal.
+- **Students** can browse and enroll in courses, log their assessment marks, track course averages, and view upcoming pending assessments.
+- **Admins** can manage the course catalog (add, edit, enable/disable, delete), manage assessments per course, and view enrollment and completion statistics.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
+### Backend
+| Package | Purpose |
 |---|---|
-| Frontend | React 19, React Router v7, Tailwind CSS v4, DaisyUI v5 |
-| Build Tool | Vite 7 |
-| Backend | Node.js, Express 5 |
-| Database | SQLite via `better-sqlite3` |
-| Dev Server | Nodemon |
+| `express` v5 | HTTP server and routing |
+| `better-sqlite3` | Synchronous SQLite database driver |
+| `bcrypt` | Password hashing |
+| `cors` | Cross-origin resource sharing |
+| `nodemon` | Development auto-reload |
+
+### Frontend
+| Package | Purpose |
+|---|---|
+| `react` v19 | UI framework |
+| `react-router-dom` v7 | Client-side routing |
+| `react-calendar` | Calendar widget |
+| `tailwindcss` v4 + `daisyui` v5 | Utility-first CSS + component library |
+| `vite` | Build tool and dev server |
 
 ---
 
 ## Project Structure
 
 ```
-smart-course-companion/
+project-root/
 ├── backend/
-│   ├── server.js          # Express server & all API routes
-│   ├── seed.js            # Database seed script
-│   ├── database.db        # SQLite database (generated at runtime)
-│   └── package.json
+│   ├── server.js         # Express server, DB setup, all API routes
+│   ├── seed.js           # Database seed script (users, courses, assessments)
+│   ├── package.json
+│   └── database.db       # SQLite database (auto-created on first run)
+│
 └── frontend/
+    ├── src/
+    │   ├── main.jsx              # App entry point, router setup
+    │   ├── App.jsx               # Landing page
+    │   ├── index.css             # Global styles (Tailwind + DaisyUI)
+    │   ├── components/
+    │   │   ├── Navbar.jsx                    # Top navigation bar with profile modal
+    │   │   └── admin/
+    │   │       ├── AddCourse.jsx             # Add course form
+    │   │       ├── CourseList.jsx            # Course list with edit/stats modals
+    │   │       └── DashboardStatistics.jsx   # Student/course count stats
+    │   └── pages/
+    │       ├── auth/
+    │       │   ├── SignIn.jsx
+    │       │   └── SignUp.jsx
+    │       ├── admin/
+    │       │   └── AdminDashboard.jsx
+    │       └── student/
+    │           └── StudentDashboard.jsx
     ├── index.html
     ├── vite.config.js
-    ├── package.json
-    └── src/
-        ├── main.jsx               # App entry point & router
-        ├── App.jsx                # Landing page
-        ├── index.css              # Global styles
-        ├── components/
-        │   ├── Navbar.jsx         # Shared navigation bar
-        │   └── admin/
-        │       ├── AddCourse.jsx
-        │       ├── CourseList.jsx
-        │       └── DashboardStatistics.jsx
-        └── pages/
-            ├── auth/
-            │   ├── SignIn.jsx
-            │   └── SignUp.jsx
-            ├── admin/
-            │   └── AdminDashboard.jsx
-            └── student/
-                └── StudentDashboard.jsx
+    └── package.json
 ```
 
 ---
 
-## Installation & Setup
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18+ recommended)
+- Node.js (v18 or later recommended)
 - npm
 
-### Steps
-
-**1. Clone or download the project**
-
-```bash
-cd smart-course-companion
-```
-
-**2. Install backend dependencies**
+### 1. Install Backend Dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-**3. Seed the database (first-time only)**
+### 2. Seed the Database (Optional)
+
+Populates the database with sample users, 38 courses, and 3 assessments per course.
 
 ```bash
 node seed.js
 ```
 
-This creates `database.db` and populates it with sample users, courses, and assessments.
-
-**4. Start the backend server**
-
-```bash
-npm run dev
-# Server runs at http://localhost:3001
-```
-
-**5. Install frontend dependencies**
-
-```bash
-cd ../frontend
-npm install
-```
-
-**6. Start the frontend dev server**
-
-```bash
-npm run dev
-# App runs at http://localhost:5173
-```
-
-### Default Seed Accounts
+**Default accounts created by the seed:**
 
 | Role | Email | Password |
 |---|---|---|
 | Admin | admin@mail.com | 123 |
 | Student | nathan@mail.com | 123 |
 
+### 3. Start the Backend Server
+
+```bash
+npm run dev
+# Server runs on http://localhost:3001
+```
+
+### 4. Install Frontend Dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### 5. Start the Frontend Dev Server
+
+```bash
+npm run dev
+# App runs on http://localhost:5173 (default Vite port)
+```
+
 ---
 
 ## Database Schema
 
-The SQLite database consists of five tables with foreign key constraints enforced.
+The SQLite database (`database.db`) is automatically created when the backend server starts.
 
 ### `users`
 
 | Column | Type | Notes |
 |---|---|---|
-| id | INTEGER | Primary key, auto-increment |
-| name | TEXT | Full name |
-| email | TEXT | Unique |
-| password | TEXT | Plain text (no hashing currently) |
-| role | TEXT | `"Student"` or `"Admin"` |
+| `id` | INTEGER PK | Auto-increment |
+| `name` | TEXT | Full name |
+| `email` | TEXT | Unique |
+| `password` | TEXT | bcrypt hashed |
+| `role` | TEXT | `"Admin"` or `"Student"` |
 
 ### `courses`
 
 | Column | Type | Notes |
 |---|---|---|
-| id | INTEGER | Primary key, auto-increment |
-| name | TEXT | Course title |
-| code | TEXT | Unique course code (e.g. `SOEN 287`) |
-| instructor | TEXT | Instructor name |
-| term | TEXT | e.g. `Winter 2026` |
-| enabled | INTEGER | `1` = active, `0` = disabled |
+| `id` | INTEGER PK | Auto-increment |
+| `name` | TEXT | e.g. `"Web Programming"` |
+| `code` | TEXT | Unique, e.g. `"SOEN 287"` |
+| `instructor` | TEXT | |
+| `term` | TEXT | e.g. `"Winter 2026"` |
+| `enabled` | INTEGER | `1` = visible to students, `0` = hidden |
 
 ### `assessments`
 
 | Column | Type | Notes |
 |---|---|---|
-| id | INTEGER | Primary key, auto-increment |
-| course_id | INTEGER | Foreign key → `courses.id` |
-| name | TEXT | Assessment name |
-| category | TEXT | `Assignment`, `Exam`, `Lab`, `Quiz`, or `Project` |
-| description | TEXT | Optional description |
-| weight | REAL | Percentage weight (0–100) |
-| due_date | TEXT | Optional, stored as `YYYY-MM-DD` string |
+| `id` | INTEGER PK | Auto-increment |
+| `course_id` | INTEGER FK | References `courses(id)` — cascades on delete |
+| `name` | TEXT | e.g. `"Midterm Exam"` |
+| `category` | TEXT | `Assignment`, `Exam`, `Lab`, `Quiz`, or `Project` |
+| `description` | TEXT | Optional |
+| `weight` | REAL | Percentage weight (e.g. `35`) |
+| `due_date` | TEXT | Optional ISO date string |
 
 ### `enrollments`
 
 | Column | Type | Notes |
 |---|---|---|
-| id | INTEGER | Primary key, auto-increment |
-| user_id | INTEGER | Foreign key → `users.id` |
-| course_id | INTEGER | Foreign key → `courses.id` |
-| — | — | Unique constraint on `(user_id, course_id)` |
+| `id` | INTEGER PK | Auto-increment |
+| `user_id` | INTEGER FK | References `users(id)` |
+| `course_id` | INTEGER FK | References `courses(id)` |
+| — | UNIQUE | `(user_id, course_id)` |
 
 ### `marks`
 
 | Column | Type | Notes |
 |---|---|---|
-| id | INTEGER | Primary key, auto-increment |
-| assessment_id | INTEGER | Foreign key → `assessments.id` |
-| user_id | INTEGER | Foreign key → `users.id` |
-| earned | REAL | Score earned by student |
-| total | REAL | Total possible score |
-| status | TEXT | `"Pending"` (default) or `"Complete"` |
-| — | — | Unique constraint on `(user_id, assessment_id)` |
-
-### Entity Relationship Summary
-
-```
-users ──< enrollments >── courses ──< assessments
-users ──< marks >── assessments
-```
-
-Cascade deletes are enabled: removing a course removes its assessments and all associated marks.
+| `id` | INTEGER PK | Auto-increment |
+| `assessment_id` | INTEGER FK | References `assessments(id)` |
+| `user_id` | INTEGER FK | References `users(id)` |
+| `earned` | REAL | Score earned (e.g. `82`) |
+| `total` | REAL | Score out of (e.g. `100`) |
+| `status` | TEXT | `"Pending"` (default) or `"Complete"` |
+| — | UNIQUE | `(user_id, assessment_id)` |
 
 ---
 
-## API Reference
+## Backend API Reference
 
-The backend runs on `http://localhost:3001`. All POST endpoints accept and return JSON.
+All endpoints are served at `http://localhost:3001`. Request/response bodies are JSON.
 
-### Authentication
+### Auth
 
 #### `POST /signup`
-Register a new user.
+Register a new student account.
 
-**Body:** `{ name, email, password, role }`  
-**Returns:** `{ id, name, email, role }`  
-**Errors:** 400 if fields missing or email invalid; 500 if email already exists.
+**Body:** `{ name, email, password }`  
+**Response:** `{ id, name, email, role }`  
+**Errors:** `400` if fields missing, email invalid, or email already taken.
 
 ---
 
 #### `POST /signin`
-Authenticate an existing user.
+Authenticate a user.
 
 **Body:** `{ email, password }`  
-**Returns:** Full user object `{ id, name, email, role }`  
-**Errors:** 400 if fields missing; 401 if credentials invalid.
+**Response:** `{ id, name, email, role }`  
+**Errors:** `400` if fields missing or email invalid. `401` if credentials are wrong.
 
 ---
 
 #### `POST /edit-user`
-Update a user's profile.
+Update the current user's profile.
 
 **Body:** `{ id, name, email, password? }`  
-If `password` is empty or omitted, only `name` and `email` are updated.  
-**Returns:** `{ success: true }`
+Omit or leave `password` blank to keep the existing password.  
+**Response:** `{ success: true }`
 
 ---
 
@@ -242,52 +237,51 @@ If `password` is empty or omitted, only `name` and `email` are updated.
 Returns all users.
 
 #### `GET /students`
-Returns all users with `role = 'Student'`.
+Returns all users with `role = "Student"`.
 
 ---
 
 ### Courses
 
 #### `GET /courses`
-Returns all courses (enabled and disabled).
+Returns all courses (admin use).
 
 #### `GET /enabled-courses`
-Returns only courses with `enabled = 1`.
+Returns only courses where `enabled = 1` (student-facing).
 
 #### `POST /add-course`
 **Body:** `{ name, code, instructor, term }`  
-**Returns:** SQLite run result with `lastInsertRowid`.
+**Errors:** `400` if any field is missing or `code` already exists.
 
 #### `POST /edit-course`
-**Body:** `{ id, name, code, instructor, term }`  
-**Returns:** SQLite run result.
+**Body:** `{ id, name, code, instructor, term }`
 
 #### `POST /delete-course`
 **Body:** `{ id }`  
-Cascades to delete all related assessments and marks.
+Cascades: deletes all assessments and associated marks.
 
 #### `POST /toggle-course`
-**Body:** `{ id }`  
-Flips the `enabled` field between `0` and `1`.
+Toggles the `enabled` flag between `0` and `1`.  
+**Body:** `{ id }`
 
 ---
 
 ### Assessments
 
 #### `GET /assessments`
-Returns all assessments across all courses.
+Returns all assessments.
 
 #### `POST /course-assessments`
-**Body:** `{ course_id }`  
-Returns all assessments for a specific course.
+Returns all assessments for a given course.  
+**Body:** `{ course_id }`
 
 #### `POST /add-assessment`
-**Body:** `{ course_id, name, category, description, weight, due_date }`  
-**Validation:** `name`, `category`, `weight` are required; weight must be a number between 1 and 100.  
-**Returns:** `{ id }` of the new assessment.
+**Body:** `{ course_id, name, category, description?, weight, due_date? }`  
+**Errors:** `400` if required fields are missing or `weight` is invalid (must be > 0 and ≤ 100).
 
 #### `POST /delete-assessment`
-**Body:** `{ id }`
+**Body:** `{ id }`  
+Cascades: deletes all marks for this assessment.
 
 ---
 
@@ -297,220 +291,154 @@ Returns all assessments for a specific course.
 Returns all enrollment records.
 
 #### `POST /user-enrollments`
-**Body:** `{ user_id }`  
-Returns full course objects for all courses a student is enrolled in.
+Returns all courses a student is enrolled in.  
+**Body:** `{ user_id }`
 
 #### `POST /enroll`
+Enroll a student in a course.  
 **Body:** `{ user_id, course_id }`
 
 #### `POST /unenroll`
-**Body:** `{ user_id, course_id }`  
-Also deletes all marks for that student in the course before removing the enrollment.
+Remove a student from a course. Also deletes all their marks for that course's assessments.  
+**Body:** `{ user_id, course_id }`
 
 ---
 
-### Marks & Grades
+### Marks & Progress
 
 #### `GET /marks`
 Returns all mark records.
 
 #### `POST /student-assessments`
+Returns all assessments for a course, joined with the student's mark data.  
 **Body:** `{ user_id, course_id }`  
-Returns all assessments for a course joined with the student's marks (earned, total, status).
+**Response:** Array of assessment objects, each extended with `earned`, `total`, `status`.
 
 #### `POST /save-mark`
-**Body:** `{ user_id, assessment_id, earned, total, status }`  
-Uses an `INSERT ... ON CONFLICT ... DO UPDATE` (upsert) pattern.  
-**Validation:** `earned` cannot exceed `total`; `total` must be > 0; both must be provided together.
+Upsert (insert or update) a mark record.  
+**Body:** `{ user_id, assessment_id, earned?, total?, status? }`  
+**Errors:** `400` if `earned > total`, `total <= 0`, mismatched earned/total, or invalid status.
 
 #### `POST /student-upcoming-assessments`
-**Body:** `{ user_id }`  
-Returns all assessments for enrolled courses where the mark status is `NULL` or `"Pending"`, ordered by `due_date ASC`.
+Returns all pending (non-complete) assessments across all of a student's enrolled courses, ordered by due date.  
+**Body:** `{ user_id }`
 
 #### `POST /all-course-averages`
+Returns a weighted average (based on assessment `weight`) for each enrolled course. Only `Complete` marks are included in the calculation.  
 **Body:** `{ user_id }`  
-Returns an object mapping `course_id → weighted average (%)` for all enrolled courses. Uses only `"Complete"` marks in the calculation. Returns `null` for courses with no completed marks.
-
-**Weighted average formula:**
-```
-average = (Σ (earned/total) × weight) / (Σ weight) × 100
-```
+**Response:** `{ [course_id]: "85.50" | null, ... }`
 
 ---
 
-### Admin Statistics
+### Statistics (Admin)
 
 #### `GET /admin-course-statistics`
-Returns all courses with enrollment count and per-assessment completion stats (how many enrolled students have a `"Complete"` mark).
+Returns all courses with enrollment count and per-assessment completion counts.
 
 #### `POST /course-statistics`
-**Body:** `{ course_id }`  
-Same as above but for a single course.
+Same as above but for a single course.  
+**Body:** `{ course_id }`
 
 ---
 
-## Frontend Architecture
+## Frontend Pages & Components
 
-The frontend is a single-page React application using React Router v7 for client-side navigation.
+### Routes
 
-### Routing
-
-| Path | Component | Description |
+| Path | Component | Access |
 |---|---|---|
-| `/` | `App` | Landing page |
-| `/auth/signup` | `SignUp` | Registration form |
-| `/auth/signin` | `SignIn` | Login form |
-| `/student/dashboard` | `StudentDashboard` | Student workspace |
-| `/admin/dashboard` | `AdminDashboard` | Admin workspace |
+| `/` | `App` | Public — landing page |
+| `/auth/signup` | `SignUp` | Public |
+| `/auth/signin` | `SignIn` | Public |
+| `/admin/dashboard` | `AdminDashboard` | Admin only |
+| `/student/dashboard` | `StudentDashboard` | Student only |
 
-### Authentication & Session
-
-User data is persisted in `localStorage` under the key `"user"` as a JSON object. On page load, each dashboard reads from `localStorage` and redirects to sign-in if no session is found. Role-based redirects are also enforced — a student visiting the admin route is redirected to the student dashboard, and vice versa.
-
-### Styling
-
-The app uses **Tailwind CSS v4** with the **DaisyUI v5** component plugin. The default theme is `light` (set via `data-theme="light"` on `<html>`). Components use DaisyUI utility classes (`btn`, `card`, `modal`, `list`, `tabs`, `stats`, `fieldset`, etc.).
+Role-based access is enforced client-side on mount: users are redirected to the correct dashboard or back to `/` based on the `role` stored in `localStorage`.
 
 ---
 
-## Pages & Components
+### Components
 
-### `App.jsx` — Landing Page
+#### `Navbar`
+Top navigation bar present on all dashboard pages. Displays the app name and user role. Contains a dropdown with:
+- **Profile** — opens a modal to edit name, email, and password.
+- **Sign Out** — clears `localStorage` and navigates to `/`.
 
-The public-facing homepage. Contains a hero section with the app tagline, a "Get Started for Free" CTA linking to `/auth/signup`, and a rotating text element showing trusted university names. Navigation includes a "Sign In" link.
-
----
-
-### `SignUp.jsx`
-
-A form collecting name, email, password, and role (Student or Admin). Performs client-side email validation before submitting to `POST /signup`. On success, stores the user in `localStorage` and navigates to the appropriate dashboard.
+**Props:** `user`, `setUser`
 
 ---
 
-### `SignIn.jsx`
+#### `admin/DashboardStatistics`
+Displays total student and course counts in a stats card.
 
-A form collecting email and password. Validates locally then calls `POST /signin`. On success, stores the user and navigates to the appropriate dashboard based on role.
-
----
-
-### `Navbar.jsx`
-
-Shared navigation bar used across both dashboards. Displays the app name and user role. Contains a dropdown avatar menu with two options:
-
-- **Profile** — Opens a modal to edit name, email, and optionally password. Calls `POST /edit-user` and updates `localStorage` on save.
-- **Sign Out** — Clears `localStorage` and navigates to the landing page.
+**Props:** `courses`
 
 ---
 
-### `AdminDashboard.jsx`
+#### `admin/AddCourse`
+Form to add a new course (name, code, instructor, term).
 
-The admin's main workspace. On mount, fetches all courses from `GET /courses` and statistics from `GET /admin-course-statistics`. Renders a greeting, dashboard statistics widget, and a tabbed interface with:
-
-- **Course List** tab — `<CourseList />`
-- **Add Course** tab — `<AddCourse />`
+**Props:** `courses`, `setCourses`
 
 ---
 
-### `DashboardStatistics.jsx`
+#### `admin/CourseList`
+Paginated list of all courses. Each course row includes:
+- **Enable / Disable** toggle buttons.
+- **View** — opens a stats modal showing enrollment count and per-assessment completion progress bars.
+- **Edit** — opens a modal to edit course details, manage existing assessments (delete), and add new assessments.
+- **Delete** — deletes the course with confirmation.
 
-Displays a stat card showing total student count (fetched from `GET /students`) and total course count (passed as a prop).
-
----
-
-### `CourseList.jsx`
-
-The main admin course management component. Renders all courses in a list. Each row includes:
-
-- An **enable/disable toggle** (calls `POST /toggle-course`; highlighted green when enabled, red outline when disabled)
-- A **view button** — opens a stats modal showing enrollment count and per-assessment completion progress bars
-- An **edit button** — opens an edit modal with three panels:
-  - Edit course fields (name, code, instructor, term)
-  - View/delete existing assessments
-  - Add a new assessment
-
-The edit modal also includes a delete button to remove the entire course.
+**Props:** `courses`, `setCourses`
 
 ---
 
-### `AddCourse.jsx`
+### Pages
 
-A simple form (name, code, instructor, term) that calls `POST /add-course` and appends the new course to the shared `courses` state.
-
----
-
-### `StudentDashboard.jsx`
-
-The student's primary workspace. On mount, fetches enabled courses, the user's enrollments, upcoming assessments, and course averages. Renders a tabbed interface with three tabs:
-
-#### Tab 1 — Course List
-Displays enrolled courses as cards. Each card shows:
-- Course code and name
-- Weighted grade average with a progress bar
-- Term and instructor
-- A button to open the course assessment modal
-
-The **assessment modal** for a course shows:
-- Course info header
-- Assessment completion progress bar
-- A list of all assessments with inline controls to:
-  - Set status (`Pending` / `Complete`)
-  - Enter `earned` and `total` scores (shown only when `Complete`)
-- Actions: unenroll, cancel, or save all marks
-
-#### Tab 2 — Enrollment
-Displays all enabled courses the student is not yet enrolled in. Each row has an enroll button that calls `POST /enroll`.
-
-#### Tab 3 — Upcoming Assessments
-Lists all pending/incomplete assessments across enrolled courses, sorted by due date. Each row shows a checkmark button to instantly mark an assessment as `"Complete"`.
+#### `SignUp` / `SignIn`
+Simple auth forms. On success, user data is stored in `localStorage` and the user is redirected to the appropriate dashboard.
 
 ---
 
-## Feature Walkthrough
+#### `AdminDashboard`
+Three-tab layout:
+1. **Course List** — renders `CourseList`
+2. **Add Course** — renders `AddCourse`
 
-### Student: Tracking a Grade
-
-1. Navigate to the **Course List** tab.
-2. Click the expand button on a course card.
-3. In the modal, change an assessment's status dropdown from `Pending` to `Complete`.
-4. Enter the `Earned` and `Total` score fields that appear.
-5. Click the save button. The weighted average on the course card updates immediately.
-
-### Admin: Disabling a Course
-
-1. Navigate to the **Course List** tab.
-2. Find the course and click the toggle button. The button styling reflects the new state (green = enabled, red outline = disabled).
-3. Disabled courses no longer appear in the student enrollment tab.
-
-### Admin: Viewing Course Statistics
-
-1. Click the eye icon on any course row.
-2. A modal shows enrollment count and a progress bar per assessment indicating how many enrolled students have completed it.
+Also renders `DashboardStatistics` at the top.
 
 ---
 
-## Data Flow
+#### `StudentDashboard`
+Three-tab layout:
 
-### Student Grade Calculation
+1. **Course List** — Cards for each enrolled course showing the weighted average and a progress bar. Clicking a card opens the enrollment modal.
 
-```
-POST /all-course-averages
-  → For each enrolled course:
-      SELECT assessments + marks WHERE status = 'Complete'
-      → weighted_sum = Σ (earned / total) × weight
-      → total_weight = Σ weight
-      → average = (weighted_sum / total_weight) × 100
-  → Returns { course_id: "average%" | null }
-```
+2. **Enrollment** — Lists available (enabled, not yet enrolled) courses with an enroll button.
 
-### Upcoming Assessments Query
+3. **Upcoming Assessments** — Lists all pending assessments sorted by due date with a quick "mark complete" button.
 
-```
-POST /student-upcoming-assessments
-  → JOIN assessments ON enrolled courses
-  → LEFT JOIN marks ON (assessment_id, user_id)
-  → WHERE status IS NULL OR status = 'Pending'
-  → ORDER BY due_date ASC
-```
+**Enrollment Modal** — Displays all assessments for the selected course. Students can set each assessment's status (`Pending` / `Complete`) and enter `earned` / `total` scores. A "Save All" button persists changes to the backend.
+
+---
+
+## User Roles
+
+### Student
+- Sign up / sign in
+- Edit own profile (name, email, password)
+- Browse enabled courses and enroll / unenroll
+- View and update assessment marks per course
+- Track weighted course averages
+- View upcoming (pending) assessments across all enrolled courses
+
+### Admin
+- Sign in (admin accounts are created manually or via seed)
+- View total student and course counts
+- Add, edit, delete courses
+- Enable or disable courses (controls student visibility)
+- Add and delete assessments per course
+- View per-course enrollment count and assessment completion statistics
 
 ---
 
@@ -518,11 +446,17 @@ POST /student-upcoming-assessments
 
 Running `node seed.js` from the `backend/` directory populates the database with:
 
-- **2 users**: one Admin (`admin@mail.com`) and one Student (`nathan@mail.com`), both with password `123`
-- **55 courses** spanning departments including Computer Science (COMP), Software Engineering (SOEN), Mathematics (MATH), Physics (PHYS), Electrical Engineering (ELEC), Mechanical Engineering (MECH), Civil Engineering (CIVI), and General Engineering (ENCS/ENGR)
-- **3 assessments per course** (165 total):
-  - Assignment 1 — 20% — due 2026-02-15
-  - Midterm Exam — 35% — due 2026-03-01
-  - Final Exam — 45% — due 2026-04-15
+- **2 users:** one Admin (`admin@mail.com`) and one Student (`student@mail.com`), both with password `123`.
+- **38 courses** spanning Computer Science, Mathematics, Physics, and Engineering departments — all set to `Winter 2026`.
+- **3 assessments per course:** `Assignment 1` (20%), `Midterm Exam` (35%), and `Final Exam` (45%).
 
-The seed script uses `INSERT OR IGNORE` to avoid duplicate entries if run multiple times. The `courses` table enforces `UNIQUE` on `code`, so duplicate codes in the seed data (e.g. `COMP 228` appearing twice) will result in only the first entry being inserted.
+All insert statements use `INSERT OR IGNORE` to avoid duplicate errors on repeated runs.
+
+---
+
+## Notes
+
+- **Authentication** is session-less. The user object (id, name, email, role) is stored in `localStorage` after sign-in and read on every page load. There are no JWTs or server-side sessions.
+- **Weighted average calculation** uses only assessments marked `Complete` with valid `earned` and `total` values. The formula is: `(Σ (earned/total) × weight) / Σ weight × 100`.
+- **Unenrolling** a student also deletes all their marks for that course's assessments.
+- **Deleting a course** cascades to delete all its assessments and any marks associated with those assessments.

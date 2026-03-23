@@ -4,7 +4,7 @@ const db = new Database("database.db")
 
 // Users
 db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Adam Admin", "admin@mail.com", bcrypt.hashSync("123", 10), "Admin")
-db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Nathan Au", "nathan@mail.com", bcrypt.hashSync("123", 10), "Student")
+db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Sally Student", "student@mail.com", bcrypt.hashSync("123", 10), "Student")
 
 // Courses
 const courses = [
