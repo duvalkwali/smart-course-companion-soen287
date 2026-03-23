@@ -9,11 +9,14 @@ function SignUp() {
     const [role, setRole] = useState("Student")
 
     const handleSignUp = async () => {
-        await fetch("http://localhost:3001/signup", {
+        const res = await fetch("http://localhost:3001/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, password, role })
         })
+        const data = await res.json()
+        localStorage.setItem("user", JSON.stringify(data))
+
         if (role === "Student") navigate("/student/dashboard")
         else if (role === "Admin") navigate("/admin/dashboard")
     }

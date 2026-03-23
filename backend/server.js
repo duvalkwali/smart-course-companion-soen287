@@ -84,7 +84,7 @@ app.post("/signup", (req, res) => {
     const { name, email, password, role } = req.body
     const insert_user = db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)")
     const result = insert_user.run(name, email, password, role)
-    res.json(result)
+    res.json({ id: result.lastInsertRowid, name, email, role })
 })
 
 app.post("/signin", (req, res) => {
@@ -96,8 +96,12 @@ app.post("/signin", (req, res) => {
 
 app.post("/edit-user", (req, res) => {
     const { id, name, email, password } = req.body
-    const result = db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, password, id)
-    res.json(result)
+    if (password && password !== "") {
+        db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, password, id)
+    } else {
+        db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, id)
+    }
+    res.json({ success: true })
 })
 
 app.get("/courses", (req, res) => {
@@ -276,4 +280,33 @@ app.post("/all-course-averages", (req, res) => {
 
 app.listen(3001, () => {
     console.log("Server running on http://localhost:3001")
+})
+
+app.get("/admin-course-statistics", (req, res) => {
+    const courses = db.prepare("SELECT * FROM courses").all()
+
+    const result = courses.map(course => {
+        const enrolled = db.prepare("SELECT COUNT(*) as count FROM enrollments WHERE course_id = ?").get(course.id)
+        const assessments = db.prepare("SELECT * FROM assessments WHERE course_id = ?").all(course.id)
+
+        const assessments_with_completion = assessments.map(assessment => {
+            const completed = db.prepare(`
+                SELECT COUNT(*) as count FROM marks 
+                WHERE assessment_id = ? AND status = 'Complete'
+            `).get(assessment.id)
+            return {
+                ...assessment,
+                completed: completed.count,
+                enrolled: enrolled.count
+            }
+        })
+
+        return {
+            ...course,
+            enrolled: enrolled.count,
+            assessments: assessments_with_completion
+        }
+    })
+
+    res.json(result)
 })

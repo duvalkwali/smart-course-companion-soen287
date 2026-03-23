@@ -1,4 +1,4 @@
-import AdminNavBar from "../../components/admin/AdminNavbar"
+import Navbar from "../../components/Navbar"
 import DashboardStatistics from "../../components/admin/DashboardStatistics"
 import AddCourse from "../../components/admin/AddCourse"
 import CourseList from "../../components/admin/CourseList"
@@ -9,6 +9,8 @@ function AdminDashboard() {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [courses, setCourses] = useState([])
+    const [statistics, setStatistics] = useState([])
+
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"))
@@ -21,12 +23,15 @@ function AdminDashboard() {
         fetch("http://localhost:3001/courses")
             .then(res => res.json())
             .then(data => setCourses(data))
+        fetch("http://localhost:3001/admin-course-statistics")
+        .then(res => res.json())
+        .then(data => setStatistics(data))
     }, [])
 
     return (
         <>
 
-            <AdminNavBar />
+            <Navbar user={user} setUser={setUser} />
             <div className="flex flex-col items-center gap-10 p-10">
                 <p className="text-4xl font-bold">Hey, {user?.name.split(" ")[0]}!</p>
                 <DashboardStatistics courses={courses} />
@@ -38,6 +43,36 @@ function AdminDashboard() {
                     <input type="radio" name="my_tabs_3" className="tab" aria-label="Add Course" />
                     <div className="tab-content bg-base-100 border-base-300 p-6">
                         <AddCourse courses={courses} setCourses={setCourses} />
+                    </div>
+                    <input type="radio" name="my_tabs_3" className="tab" aria-label="Statistics" />
+                    <div className="tab-content bg-base-100 border-base-300 p-6">
+                        <ul className="list bg-base-100 rounded-box shadow">
+                            {statistics.length == 0 ? (
+                                <li className="list-row">
+                                    <div className="text-xs font-semibold opacity-60">No statistics to display.</div>
+                                </li>
+                            ) : statistics.map((course, index) => (
+                                <li key={index} className="list-row flex-col items-start gap-2">
+                                    <div className="w-full">
+                                        <div className="font-bold">{course.code} - {course.name}</div>
+                                        <div className="text-xs opacity-60">{course.enrolled} students enrolled</div>
+                                    </div>
+                                    {course.assessments.map((assessment, i) => (
+                                        <div key={i} className="w-full">
+                                            <div className="flex justify-between text-xs opacity-60 mb-1">
+                                                <span>{assessment.name}</span>
+                                                <span>{assessment.completed}/{assessment.enrolled} complete</span>
+                                            </div>
+                                            <progress
+                                                className="progress progress-primary w-full"
+                                                value={assessment.completed}
+                                                max={assessment.enrolled || 1}
+                                            />
+                                        </div>
+                                    ))}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
             </div>

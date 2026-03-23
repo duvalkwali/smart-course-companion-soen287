@@ -32,7 +32,6 @@ function App() {
                                 <span>Université de Montréal</span>
                                 <span>Polytechnique Montréal</span>
                                 <span>HEC Montréal</span>
-
                             </span>
                         </span>
                     </span>

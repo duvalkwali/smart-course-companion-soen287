@@ -1,4 +1,4 @@
-import StudentNavbar from "../../components/student/StudentNavbar.jsx"
+import Navbar from "../../components/Navbar"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,9 @@ function StudentDashboard() {
     const [selectedEnrollmentAssessments, setSelectedEnrollmentAssessments] = useState([])
     const [upcomingAssessments, setUpcomingAssessments] = useState([])
     const [courseAverages, setCourseAverages] = useState({})
+
+    const completedSelectedEnrollmentAssessments = selectedEnrollmentAssessments.filter(a => a.status == "Complete").length
+    const totalSelectedEnrollmentAssessments = selectedEnrollmentAssessments.length
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"))
@@ -172,7 +175,7 @@ function StudentDashboard() {
 
     return (
         <>
-            <StudentNavbar />
+            <Navbar user={user} setUser={setUser} />
 
             <div className="flex flex-col items-center gap-10 p-10"> 
                 <p className="text-4xl font-bold">Hey, {user?.name.split(" ")[0]}!</p>
@@ -189,13 +192,14 @@ function StudentDashboard() {
                                 </li>
                             </ul>
                         ) : (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="flex flex-row flex-wrap justify-center gap-4">
                                 {enrollments.map((enrollment, index) => (
-                                        <div key={index} className="card bg-base-100 w-96 shadow-sm">
+                                        <div key={index} className="card bg-base-100 w-80 shadow-sm">
                                             <div className="card-body">
                                                 <h2 className="card-title">{enrollment.code} - {enrollment.name}</h2>
                                                 <p className="text-sm font-bold">
                                                     Average: {courseAverages[enrollment.id] ? `${courseAverages[enrollment.id]}%` : "N/A"}
+                                                    <progress className="progress w-full" value={courseAverages[enrollment.id] ? courseAverages[enrollment.id] : 0} max="100"></progress>
                                                 </p>
                                                 <p>{enrollment.term} - {enrollment.instructor}</p>
                                                 <div className="card-actions justify-end">
@@ -233,7 +237,7 @@ function StudentDashboard() {
                                         </div>
                                         <div className="flex flex-row ml-auto gap-1">
                                             <button className="btn btn-square btn-ghost" onClick={() => handleEnroll(course.id)}>
-                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Enroll" />
+                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=86326&format=png&color=000000" alt="Enter" />
                                             </button>
                                         </div>
                                     </li>
@@ -284,6 +288,11 @@ function StudentDashboard() {
                         <>
                             <h3 className="font-bold text-lg">{selectedEnrollment.code} - {selectedEnrollment.name}</h3>
                             <p className="text-sm opacity-60 mb-4">{selectedEnrollment.term} - {selectedEnrollment.instructor}</p>
+
+                            <p className="text-sm font-bold mb-4">
+                                Progress: {completedSelectedEnrollmentAssessments}/{totalSelectedEnrollmentAssessments}
+                                <progress className="progress w-full" value={completedSelectedEnrollmentAssessments} max={totalSelectedEnrollmentAssessments}></progress>
+                            </p>
 
                             <ul className="list bg-base-100 rounded-box shadow overflow-y-auto max-h-80">
                                 {selectedEnrollmentAssessments.length == 0 ? (
