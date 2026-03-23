@@ -9,12 +9,10 @@ function AdminDashboard() {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [courses, setCourses] = useState([])
-    const [statistics, setStatistics] = useState([])
-
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"))
-        if (!storedUser) navigate("/auth/signin")
+        if (!storedUser) navigate("/")
         else if (storedUser.role != "Admin") navigate("/student/dashboard")
         else setUser(storedUser)
     }, [])
@@ -30,7 +28,6 @@ function AdminDashboard() {
 
     return (
         <>
-
             <Navbar user={user} setUser={setUser} />
             <div className="flex flex-col items-center gap-10 p-10">
                 <p className="text-4xl font-bold">Hey, {user?.name.split(" ")[0]}!</p>
@@ -46,7 +43,6 @@ function AdminDashboard() {
                     </div>
                 </div>
             </div>
-            
         </>
     )
 }

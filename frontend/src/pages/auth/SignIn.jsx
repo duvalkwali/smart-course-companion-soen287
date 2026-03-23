@@ -34,6 +34,13 @@ function SignIn() {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center">
+
+            <div className="tooltip mt-4" data-tip="Go Back">
+                <button className="btn btn-square btn-ghost" onClick={() => navigate("/")}>
+                    <img className="w-5" src="https://img.icons8.com/?size=100&id=84994&format=png&color=000000" alt="Back" />
+                </button>
+            </div>
+            
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
                 <legend className="fieldset-legend">Sign In</legend>
 
@@ -46,7 +53,7 @@ function SignIn() {
 
                 <div className="tooltip mt-4" data-tip="Sign In">
                     <button className="btn w-full" onClick={handleSignIn}>
-                        <img className="w-5" src="https://img.icons8.com/?size=100&id=87587&format=png&color=000000" alt="Sign In" />
+                        <img className="w-5" src="https://img.icons8.com/?size=100&id=Af8qfs0NUsqH&format=png&color=000000" alt="Sign In" />
                     </button>
                 </div>
                     

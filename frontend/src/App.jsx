@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 function App() {
+    
     return (
         <>
             <div className="hero bg-base-200 min-h-screen">
@@ -18,7 +19,7 @@ function App() {
                         <Link className='btn btn-link' to="/auth/signin">Sign In</Link>
                     </div>
                 </div>
-                <div className="hero-content flex flex-col gap-10">
+                <div className="hero-content flex flex-col gap-10 p-16">
                     <h1 className="text-8xl text-center font-bold">Master Your Semester, One Assessment at a Time.</h1>
                     <h2 className='text-4xl'>The all-in-one workspace for students to track grades and for instructors to guide academic success. Built for the modern university experience.</h2>
                     <Link className='btn btn-wide btn-primary' to="/auth/signup">Get Started for Free</Link>

@@ -17,7 +17,7 @@ function StudentDashboard() {
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"))
-        if (!storedUser) navigate("/auth/signin")
+        if (!storedUser) navigate("/")
         else if (storedUser.role != "Student") navigate("/admin/dashboard")
         else setUser(storedUser)
 
