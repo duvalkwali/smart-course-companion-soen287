@@ -134,24 +134,34 @@ function CourseList({ courses, setCourses }) {
                 ) : courses.map((course, index) => (
                         <li key={index} className="list-row">
                             <div className="flex flex-row ml-auto gap-1">
-                                <button className={`btn btn-square btn-ghost flex items-center ${course.enabled ? "" : "btn-outline btn-error"}`} onClick={() => handleToggleCourse(course)}>
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82553&format=png&color=000000" alt="Disabled" />
-                                </button>
-                                <button className={`btn btn-square btn-ghost flex items-center ${course.enabled ? "btn-outline btn-success" : ""}`} onClick={() => handleToggleCourse(course)}> 
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Enabled" />
-                                </button>
+                                <div className="tooltip" data-tip="Disable">
+                                    <button className={`btn btn-square btn-ghost flex items-center ${course.enabled ? "" : "btn-outline btn-error"}`} onClick={() => handleToggleCourse(course)}>
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=82553&format=png&color=000000" alt="Disabled" />
+                                    </button>
+                                </div>
+                                <div className="tooltip" data-tip="Enable">
+                                    <button className={`btn btn-square btn-ghost flex items-center ${course.enabled ? "btn-outline btn-success" : ""}`} onClick={() => handleToggleCourse(course)}> 
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Enabled" />
+                                    </button>
+                                </div>
                             </div>
                             <div>
                                 <div>{course.code} - {course.name}</div>
                                 <div className="text-xs font-semibold opacity-60">{course.term} - {course.instructor}</div>
                             </div>
                             <div className="flex flex-row ml-auto gap-1">
-                                <button className="btn btn-square btn-ghost" onClick={() => openStatsModal(course)}>
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" alt="View" />
-                                </button>
-                                <button className="btn btn-square btn-ghost" onClick={() => openCourseModal(course)}>
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=86373&format=png&color=000000" alt="Edit" />
-                                </button>
+                                <div className="tooltip" data-tip="View">
+                                    <button className="btn btn-square btn-ghost" onClick={() => openStatsModal(course)}>
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" alt="View" />
+                                    </button>
+                                </div>
+                                <div className="tooltip" data-tip="Edit">
+                                    <button className="btn btn-square btn-ghost" onClick={() => openCourseModal(course)}>
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=86373&format=png&color=000000" alt="Edit" />
+                                    </button>
+                                </div>
+
+                                
                             </div>
                         </li>
                     )
@@ -198,9 +208,11 @@ function CourseList({ courses, setCourses }) {
                                                         <div className="text-xs font-semibold opacity-60">{assessment.weight}% - {assessment.due_date}</div>
                                                     </div>
                                                     <div className="flex flex-row ml-auto gap-1">
-                                                        <button className="btn btn-square btn-ghost" onClick={() => handleDeleteAssessment(assessment.id)}>
-                                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=99933&format=png&color=000000" alt="Delete" />
-                                                        </button>
+                                                        <div className="tooltip" data-tip="Delete">
+                                                            <button className="btn btn-square btn-ghost" onClick={() => handleDeleteAssessment(assessment.id)}>
+                                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=99933&format=png&color=000000" alt="Delete" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </li>
                                             )
@@ -231,10 +243,11 @@ function CourseList({ courses, setCourses }) {
 
                                     <label className="label">Due Date (optional)</label>
                                     <input type="date" className="input w-full" value={assessmentDueDate} onChange={e => setAssessmentDueDate(e.target.value)} />
-
-                                    <button className="btn btn-square mt-4" onClick={handleAddAssessment}>
-                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=84991&format=png&color=000000" alt="Add" />
-                                    </button>
+                                    <div className="tooltip mt-4" data-tip="Add">
+                                        <button className="btn w-full" onClick={handleAddAssessment}>
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=84991&format=png&color=000000" alt="Add" />
+                                        </button>
+                                    </div>
                                 </fieldset>
 
                             </>
@@ -243,18 +256,23 @@ function CourseList({ courses, setCourses }) {
                     </div>
 
                     <div className="modal-action">
-                        <button className="btn btn-square mr-auto" onClick={() => handleDeleteCourse(selectedCourse.id)}>
-                            <img className="w-5" src="https://img.icons8.com/?size=100&id=99933&format=png&color=000000" alt="Delete" />
-                        </button>
-                        <form method="dialog">
-                            <button className="btn btn-square">
-                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                        <div className="tooltip mr-auto" data-tip="Delete">
+                            <button className="btn btn-square" onClick={() => handleDeleteCourse(selectedCourse.id)}>
+                                <img className="w-5" src="https://img.icons8.com/?size=100&id=99933&format=png&color=000000" alt="Delete" />
                             </button>
+                        </div>
+                        <form method="dialog">
+                            <div className="tooltip" data-tip="Cancel">
+                                <button className="btn btn-square">
+                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                                </button>
+                            </div>
                         </form>
-                        <button className="btn btn-square" onClick={handleEditCourse}>
-                            <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
-                        </button>
-
+                        <div className="tooltip" data-tip="Save">
+                            <button className="btn btn-square" onClick={handleEditCourse}>
+                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </dialog>
@@ -293,7 +311,11 @@ function CourseList({ courses, setCourses }) {
 
                             <div className="modal-action">
                                 <form method="dialog">
-                                    <button className="btn">Close</button>
+                                    <div className="tooltip" data-tip="Cancel">
+                                        <button className="btn btn-square">
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </>

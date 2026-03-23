@@ -54,7 +54,11 @@ function SignUp() {
                     <option>Admin</option>
                 </select>
 
-                <button className="btn btn-neutral mt-4" onClick={handleSignUp}>Sign Up</button>
+                <div className="tooltip mt-4" data-tip="Sign Up">
+                    <button className="btn w-full" onClick={handleSignUp}>
+                        <img className="w-5" src="https://img.icons8.com/?size=100&id=87587&format=png&color=000000" alt="Sign Up" />
+                    </button>
+                </div>
             </fieldset>
         </div>
     )

@@ -230,9 +230,11 @@ function StudentDashboard() {
                                                 </p>
                                                 <p>{enrollment.term} - {enrollment.instructor}</p>
                                                 <div className="card-actions justify-end">
-                                                    <button className="btn btn-square" onClick={() => openEnrollmentModal(enrollment)}>
-                                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=98028&format=png&color=000000" alt="Expand" />
-                                                    </button>
+                                                    <div className="tooltip" data-tip="Open">
+                                                        <button className="btn btn-square" onClick={() => openEnrollmentModal(enrollment)}>
+                                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=98028&format=png&color=000000" alt="Open" />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -263,9 +265,11 @@ function StudentDashboard() {
                                             <div className="text-xs font-semibold opacity-60">{course.term} - {course.instructor}</div>
                                         </div>
                                         <div className="flex flex-row ml-auto gap-1">
-                                            <button className="btn btn-square btn-ghost" onClick={() => handleEnroll(course.id)}>
-                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=86326&format=png&color=000000" alt="Enter" />
-                                            </button>
+                                            <div className="tooltip" data-tip="Enroll">
+                                                <button className="btn btn-square btn-ghost" onClick={() => handleEnroll(course.id)}>
+                                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=86326&format=png&color=000000" alt="Enroll" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </li>
                                 )
@@ -292,9 +296,11 @@ function StudentDashboard() {
 
                                         </div>
                                         <div className="flex flex-row ml-auto gap-1">
-                                            <button className="btn btn-square btn-ghost" onClick={() => handleSaveMark({ ...assessment, status: "Complete" })}>
-                                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Complete" />
-                                            </button>
+                                            <div className="tooltip" data-tip="Complete">
+                                                <button className="btn btn-square btn-ghost" onClick={() => handleSaveMark({ ...assessment, status: "Complete" })}>
+                                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82759&format=png&color=000000" alt="Complete" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </li>
                                 )
@@ -385,17 +391,26 @@ function StudentDashboard() {
                             </ul>
 
                             <div className="modal-action">
-                                <button className="btn btn-square mr-auto" onClick={() => handleUnenroll(selectedEnrollment.id)}>
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=3C7IH9dQArFF&format=png&color=000000" alt="Exit" />
-                                </button>
+                                <div className="tooltip mr-auto" data-tip="Unenroll">
+                                    <button className="btn btn-square" onClick={() => handleUnenroll(selectedEnrollment.id)}>
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=3C7IH9dQArFF&format=png&color=000000" alt="Unenroll" />
+                                    </button>
+                                </div>
+                                
                                 <form method="dialog">
-                                    <button className="btn btn-square">
-                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
-                                    </button>                                
+                                    <div className="tooltip" data-tip="Cancel">
+                                        <button className="btn btn-square">
+                                            <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                                        </button> 
+                                    </div>
+                                                                  
                                 </form>
-                                <button className="btn btn-square" onClick={handleSaveAllMarks}>
-                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
-                                </button>
+                                <div className="tooltip" data-tip="Save">
+                                    <button className="btn btn-square" onClick={handleSaveAllMarks}>
+                                        <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
+                                    </button>
+                                </div>
+                                
                             </div>
                         </>
                     )}

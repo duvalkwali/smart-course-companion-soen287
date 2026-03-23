@@ -43,7 +43,13 @@ function SignIn() {
                 <label className="label">Password</label>
                 <input type="password" className="input" placeholder="Password" onChange={e => setPassword(e.target.value)} />
 
-                <button className="btn btn-neutral mt-4" onClick={handleSignIn}>Sign In</button>
+
+                <div className="tooltip mt-4" data-tip="Sign In">
+                    <button className="btn w-full" onClick={handleSignIn}>
+                        <img className="w-5" src="https://img.icons8.com/?size=100&id=87587&format=png&color=000000" alt="Sign In" />
+                    </button>
+                </div>
+                    
             </fieldset>
         </div>
     )

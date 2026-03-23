@@ -34,33 +34,30 @@ function Navbar({ user, setUser }) {
     return (
         <>
             <div className="navbar bg-base-100 shadow-sm">
-                    <div className="navbar-start">
-                        <a className="btn btn-ghost text-xl">Smart Course Companion - {user?.role}</a>
-                    </div>
-                    <div className="navbar-center">
-                        <ul className="menu menu-horizontal px-1">
-                            {/* <li><a>Admins</a></li> */}
-                            {/* <li><a>Students</a></li> */}
+                <div className="navbar-start">
+                    <a className="btn btn-ghost text-xl">Smart Course Companion - {user?.role}</a>
+                </div>
+                {/* <div className="navbar-center">
+                    <ul className="menu menu-horizontal px-1">
+                        <li><a>Admins</a></li>
+                        <li><a>Students</a></li>
+                    </ul>
+                </div> */}
+                <div className="navbar-end">
+                    <div className="dropdown dropdown-end">
+                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar avatar-placeholder">
+                            <div className="ring-neutral w-10 rounded-full ring-2">
+                                <span>{user?.name?.charAt(0)}</span>
+                            </div>
+                        </div>
+                        <ul
+                            tabIndex="-1"
+                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                            <li><a onClick={() => document.getElementById("profile_modal").showModal()}>Profile</a></li>
+                            <li><a onClick={handleSignOut}>Sign Out</a></li>
                         </ul>
                     </div>
-                    
-                    <div className="navbar-end">
-                        {/* <button className='btn btn-link' onClick={handleSignOut}>Sign Out</button> */}
-                        <div className="dropdown dropdown-end">
-
-                            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar avatar-placeholder">
-                                <div className="ring-neutral w-10 rounded-full ring-2">
-                                    <span>{user?.name?.charAt(0)}</span>
-                                </div>
-                            </div>
-                            <ul
-                                tabIndex="-1"
-                                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                                <li><a onClick={() => document.getElementById("profile_modal").showModal()}>Profile</a></li>
-                                <li><a onClick={handleSignOut}>Sign Out</a></li>
-                            </ul>
-                    </div>
-                    </div>
+                </div>
             </div>
 
             <dialog id="profile_modal" className="modal">
@@ -78,9 +75,20 @@ function Navbar({ user, setUser }) {
                     </fieldset>
                     <div className="modal-action">
                         <form method="dialog">
-                            <button className="btn">Cancel</button>
+                            <div className="tooltip" data-tip="Cancel">
+                                <button className="btn btn-square">
+                                    <img className="w-5" src="https://img.icons8.com/?size=100&id=82764&format=png&color=000000" alt="Cancel" />
+                                </button>
+
+                            </div>
+                            
                         </form>
-                        <button className="btn btn-neutral" onClick={handleEditUser}>Save</button>
+                        <div className="tooltip" data-tip="Save">
+                            <button className="btn btn-square" onClick={handleEditUser}>
+                                <img className="w-5" src="https://img.icons8.com/?size=100&id=82736&format=png&color=000000" alt="Save" />
+                            </button>
+                        </div>
+                        
                     </div>
                 </div>
             </dialog>

@@ -35,11 +35,11 @@ function AddCourse({ courses, setCourses }) {
 
             <label className="label">Term</label>
             <input type="text" className="input w-full" placeholder="Winter 2026" value={term} onChange={e => setTerm(e.target.value)} />
-
-            <button className="btn btn-square mt-4" onClick={handleAddCourse}>
-                <img className="w-5" src="https://img.icons8.com/?size=100&id=84991&format=png&color=000000" alt="Add" />
-                
-            </button>
+            <div className="tooltip mt-4" data-tip="Add">
+                <button className="btn w-full" onClick={handleAddCourse}>
+                    <img className="w-5" src="https://img.icons8.com/?size=100&id=84991&format=png&color=000000" alt="Add" />
+                </button>
+            </div>
 
         </fieldset>
     )
