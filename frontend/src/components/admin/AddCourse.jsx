@@ -7,12 +7,20 @@ function AddCourse({ courses, setCourses }) {
     const [term, setTerm] = useState("")
 
     const handleAddCourse = async () => {
+        if (!name || !code || !instructor || !term) {
+            alert("All fields are required")
+            return
+        }
         const res = await fetch("http://localhost:3001/add-course", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, code, instructor, term })
         })
         const data = await res.json()
+        if (!res.ok) {
+            alert(data.error)
+            return
+        }
         setCourses([...courses, { id: data.lastInsertRowid, name, code, instructor, term, enabled: 1 }])
         setName("")
         setCode("")

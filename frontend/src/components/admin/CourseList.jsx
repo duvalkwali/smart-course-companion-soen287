@@ -19,20 +19,24 @@ function CourseList({ courses, setCourses }) {
     const [assessmentName, setAssessmentName] = useState("")
     const [assessmentWeight, setAssessmentWeight] = useState("")
     const [assessmentDueDate, setAssessmentDueDate] = useState("")
-    const [assessmentCategory, setAssessmentCategory] = useState("")
+    const [assessmentCategory, setAssessmentCategory] = useState("Assignment")
     const [assessmentDescription, setAssessmentDescription] = useState("")
 
     const handleEditCourse = async () => {
-
         if (!selectedCourse.name || !selectedCourse.code || !selectedCourse.instructor || !selectedCourse.term) {
             alert("All fields are required")
             return
         }
-        await fetch("http://localhost:3001/edit-course", {
+        const res = await fetch("http://localhost:3001/edit-course", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(selectedCourse)
         })
+        const data = await res.json()
+        if (!res.ok) {
+            alert(data.error)
+            return
+        }
         setCourses(courses.map(c => {
             if (c.id == selectedCourse.id) return selectedCourse
             return c
@@ -53,6 +57,7 @@ function CourseList({ courses, setCourses }) {
     }
 
     const handleDeleteCourse = async (id) => {
+        if (!confirm("Are you sure?")) return
         await fetch("http://localhost:3001/delete-course", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -84,6 +89,10 @@ function CourseList({ courses, setCourses }) {
             })
         })
         const data = await res.json()
+        if (!res.ok) {
+            alert(data.error)
+            return
+        }
         setAssessments([...assessments, { 
             id: data.id, 
             course_id: selectedCourse.id, 
@@ -101,6 +110,7 @@ function CourseList({ courses, setCourses }) {
     }
 
     const handleDeleteAssessment = async (id) => {
+        if (!confirm("Are you sure?")) return
         await fetch("http://localhost:3001/delete-assessment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -131,8 +141,8 @@ function CourseList({ courses, setCourses }) {
                         <div className="text-xs font-semibold opacity-60">No courses to display.</div>
                     </li>
 
-                ) : courses.map((course, index) => (
-                        <li key={index} className="list-row">
+                ) : courses.map((course) => (
+                        <li key={course.id} className="list-row">
                             <div className="flex flex-row ml-auto gap-1">
                                 <div className="tooltip" data-tip="Disable">
                                     <button className={`btn btn-square btn-ghost flex items-center ${course.enabled ? "" : "btn-outline btn-error"}`} onClick={() => handleToggleCourse(course)}>
@@ -201,8 +211,8 @@ function CourseList({ courses, setCourses }) {
                                                 <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
                                             </li>
 
-                                        ) : assessments.map((assessment, index) => (
-                                                <li key={index} className="list-row">
+                                        ) : assessments.map((assessment) => (
+                                                <li key={assessment.id} className="list-row">
                                                     <div>
                                                         <div>{assessment.name}</div>
                                                         <div className="text-xs font-semibold opacity-60">{assessment.weight}% - {assessment.due_date}</div>
@@ -291,8 +301,8 @@ function CourseList({ courses, setCourses }) {
                                     <li className="list-row">
                                         <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
                                     </li>
-                                ) : selectedCourseStats.assessments.map((assessment, index) => (
-                                    <li key={index} className="list-row">
+                                ) : selectedCourseStats.assessments.map((assessment) => (
+                                    <li key={assessment.id} className="list-row">
                                             <div>
                                                 <div>{assessment.name}</div>
                                                 <div className="text-xs font-semibold opacity-60">{assessment.category} - {assessment.weight}%</div>

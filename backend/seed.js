@@ -1,9 +1,10 @@
 const Database = require("better-sqlite3")
+const bcrypt = require("bcrypt")
 const db = new Database("database.db")
 
 // Users
-db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Adam Admin", "admin@mail.com", "123", "Admin")
-db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Nathan Au", "nathan@mail.com", "123", "Student")
+db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Adam Admin", "admin@mail.com", bcrypt.hashSync("123", 10), "Admin")
+db.prepare("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Nathan Au", "nathan@mail.com", bcrypt.hashSync("123", 10), "Student")
 
 // Courses
 const courses = [
@@ -45,23 +46,6 @@ const courses = [
     { name: "Robotics", code: "MECH 412", instructor: "Chloe Campbell", term: "Winter 2026" },
     { name: "Fluid Mechanics", code: "MECH 321", instructor: "Nathan Parker", term: "Winter 2026" },
     { name: "Structural Analysis", code: "CIVI 341", instructor: "Penelope Evans", term: "Winter 2026" },
-    { name: "Environmental Engineering", code: "CIVI 452", instructor: "Ryan Edwards", term: "Winter 2026" },
-    { name: "Project Management", code: "ENCS 282", instructor: "Layla Collins", term: "Winter 2026" },
-    { name: "Technical Writing", code: "ENCS 272", instructor: "Dylan Stewart", term: "Winter 2026" },
-    { name: "Ethics in Engineering", code: "ENCS 393", instructor: "Nora Sanchez", term: "Winter 2026" },
-    { name: "Human Computer Interaction", code: "SOEN 357", instructor: "Caleb Morris", term: "Winter 2026" },
-    { name: "Software Testing", code: "SOEN 345", instructor: "Hannah Rogers", term: "Winter 2026" },
-    { name: "Software Architecture", code: "SOEN 422", instructor: "Eli Reed", term: "Winter 2026" },
-    { name: "Distributed Systems", code: "SOEN 423", instructor: "Addison Cook", term: "Winter 2026" },
-    { name: "Cloud Computing", code: "SOEN 487", instructor: "Miles Bailey", term: "Winter 2026" },
-    { name: "Cybersecurity", code: "SOEN 321", instructor: "Aubrey Bell", term: "Winter 2026" },
-    { name: "Cryptography", code: "COMP 425", instructor: "Ezra Cooper", term: "Winter 2026" },
-    { name: "Bioinformatics", code: "COMP 561", instructor: "Stella Richardson", term: "Winter 2026" },
-    { name: "Game Development", code: "COMP 376", instructor: "Finn Murphy", term: "Winter 2026" },
-    { name: "Mobile Development", code: "SOEN 390", instructor: "Aurora Price", term: "Winter 2026" },
-    { name: "Natural Language Processing", code: "COMP 550", instructor: "Jasper Bennett", term: "Winter 2026" },
-    { name: "Computer Architecture", code: "COMP 228", instructor: "Ivy Wood", term: "Winter 2026" },
-    { name: "Logic Programming", code: "COMP 228", instructor: "Felix Barnes", term: "Winter 2026" },
 ]
 
 const insert_course = db.prepare("INSERT OR IGNORE INTO courses (name, code, instructor, term) VALUES (?, ?, ?, ?)")

@@ -24,7 +24,7 @@ function StudentDashboard() {
         fetch("http://localhost:3001/enabled-courses")
             .then(res => res.json())
             .then(data => setEnabledCourses(data))
-    }, [])
+    }, [navigate])
 
     useEffect(() => {
         if (!user) return
@@ -79,6 +79,7 @@ function StudentDashboard() {
     }
 
     const handleUnenroll = async (course_id) => {
+        if (!confirm("Are you sure?")) return
         await fetch("http://localhost:3001/unenroll", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -220,8 +221,8 @@ function StudentDashboard() {
                             </ul>
                         ) : (
                             <div className="flex flex-row flex-wrap justify-center gap-4">
-                                {enrollments.map((enrollment, index) => (
-                                        <div key={index} className="card bg-base-100 w-80 shadow-sm">
+                                {enrollments.map((enrollment) => (
+                                        <div key={enrollment.id} className="card bg-base-100 w-80 shadow-sm">
                                             <div className="card-body">
                                                 <h2 className="card-title">{enrollment.code} - {enrollment.name}</h2>
                                                 <p className="text-sm font-bold">
@@ -258,8 +259,8 @@ function StudentDashboard() {
                                     <div className="text-xs font-semibold opacity-60">No courses to display.</div>
                                 </li>
 
-                            ) : enabledCourses.filter(c => !enrollments.some(e => e.id == c.id)).map((course, index) => (
-                                    <li key={index} className="list-row">
+                            ) : enabledCourses.filter(c => !enrollments.some(e => e.id == c.id)).map((course) => (
+                                    <li key={course.id} className="list-row">
                                         <div>
                                             <div>{course.code} - {course.name}</div>
                                             <div className="text-xs font-semibold opacity-60">{course.term} - {course.instructor}</div>
@@ -288,8 +289,8 @@ function StudentDashboard() {
                                 <li className="list-row">
                                     <div className="text-xs font-semibold opacity-60">No assessments to display.</div>
                                 </li>
-                            ) : upcomingAssessments.map((assessment, index) => (
-                                    <li key={index} className="list-row">
+                            ) : upcomingAssessments.map((assessment) => (
+                                    <li key={assessment.id} className="list-row">
                                         <div>
                                             <div>{assessment.name}</div>
                                             <div className="text-xs font-semibold opacity-60">{assessment.course_code} - {assessment.course_name} - {assessment.weight}% - Due {assessment.due_date}</div>
@@ -334,7 +335,7 @@ function StudentDashboard() {
                                     </li>
 
                                 ) : selectedEnrollmentAssessments.map((assessment, index) => (
-                                        <li key={index} className="list-row">
+                                        <li key={assessment.id} className="list-row">
                                             <div>
                                                 <div>{assessment.name}</div>
                                                 <div className="text-xs font-semibold opacity-60">{assessment.weight}% - {assessment.due_date}</div>

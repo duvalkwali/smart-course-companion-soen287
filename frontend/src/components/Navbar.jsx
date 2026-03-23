@@ -19,11 +19,16 @@ function Navbar({ user, setUser }) {
     }
 
     const handleEditUser = async () => {
-        await fetch("http://localhost:3001/edit-user", {
+        const res = await fetch("http://localhost:3001/edit-user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: user.id, name, email, password })
         })
+        const data = await res.json()
+        if (!res.ok) {
+            alert(data.error)
+            return
+        }
         const updatedUser = { ...user, name, email }
         localStorage.setItem("user", JSON.stringify(updatedUser))
         setUser(updatedUser)

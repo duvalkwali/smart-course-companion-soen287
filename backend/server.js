@@ -81,32 +81,46 @@ app.get("/students", (req, res) => {
 })
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const bcrypt = require('bcrypt')
 
-app.post("/signup", (req, res) => {
-    const { name, email, password, role } = req.body
+app.post("/signup", async (req, res) => {
+    const { name, email, password } = req.body
+    const role = "Student"
     if (!name || !email || !password || !role) return res.status(400).json({ error: "All fields are required" })
     if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
+    const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email)
+    if (existing) return res.status(400).json({ error: "Invalid email" })
+    const hashed_password = await bcrypt.hash(password, 10)
     const insert_user = db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)")
-    const result = insert_user.run(name, email, password, role)
+    const result = insert_user.run(name, email, hashed_password, role)
     res.json({ id: result.lastInsertRowid, name, email, role })
 })
 
-app.post("/signin", (req, res) => {
+app.post("/signin", async (req, res) => {
     const { email, password } = req.body
     if (!email || !password) return res.status(400).json({ error: "All fields are required" })
     if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
-    const select_user = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?")
-    const result = select_user.get(email, password)
-    if (!result) return res.status(401).json({ error: "Invalid email or password" })
-    res.json(result)
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email)
+    if (!user) return res.status(401).json({ error: "Invalid email or password" })
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) return res.status(401).json({ error: "Invalid email or password" })
+    res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+    })
 })
 
-app.post("/edit-user", (req, res) => {
+app.post("/edit-user", async (req, res) => {
     const { id, name, email, password } = req.body
     if (!name || !email) return res.status(400).json({ error: "Name and email are required" })
     if (!emailRegex.test(email)) return res.status(400).json({ error: "Invalid email" })
+    const existing = db.prepare("SELECT id FROM users WHERE email = ? AND id != ?").get(email, id)
+    if (existing) return res.status(400).json({ error: "Invalid email" })
     if (password && password !== "") {
-        db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, password, id)
+        const hashed_password = await bcrypt.hash(password, 10)
+        db.prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?").run(name, email, hashed_password, id)
     } else {
         db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, id)
     }
@@ -122,6 +136,8 @@ app.get("/courses", (req, res) => {
 app.post("/add-course", (req, res) => {
     const { name, code, instructor, term } = req.body
     if (!name || !code || !instructor || !term) return res.status(400).json({ error: "All fields are required" })
+    const existing = db.prepare("SELECT id FROM courses WHERE code = ?").get(code)
+    if (existing) return res.status(400).json({ error: "Invalid code" })
     const insert_course = db.prepare("INSERT INTO courses (name, code, instructor, term) VALUES (?, ?, ?, ?)")
     const result = insert_course.run(name, code, instructor, term)
     res.json(result)
@@ -130,7 +146,9 @@ app.post("/add-course", (req, res) => {
 app.post("/edit-course", (req, res) => {
     const { id, name, code, instructor, term } = req.body
     if (!name || !code || !instructor || !term) return res.status(400).json({ error: "All fields are required" })
-    const update_course = db.prepare("UPDATE courses SET name = ?, code = ?, instructor = ?, term = ? WHERE id = ?");
+    const existing = db.prepare("SELECT id FROM courses WHERE code = ? AND id != ?").get(code, id)
+    if (existing) return res.status(400).json({ error: "Invalid code" })
+    const update_course = db.prepare("UPDATE courses SET name = ?, code = ?, instructor = ?, term = ? WHERE id = ?")
     const result = update_course.run(name, code, instructor, term, id);
     res.json(result);
 })
@@ -232,6 +250,7 @@ app.post("/save-mark", (req, res) => {
     }
     if (earned && !total) return res.status(400).json({ error: "Invalid total" })
     if (!earned && total) return res.status(400).json({ error: "Invalid earned" })
+    if (status && status !== "Pending" && status !== "Complete") return res.status(400).json({ error: "Invalid status" })
 
     const upsert_mark = db.prepare(`
         INSERT INTO marks (user_id, assessment_id, earned, total, status)

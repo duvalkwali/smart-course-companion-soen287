@@ -6,7 +6,6 @@ function SignUp() {
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [role, setRole] = useState("Student")
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     const handleSignUp = async () => {
@@ -21,7 +20,7 @@ function SignUp() {
         const res = await fetch("http://localhost:3001/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password, role })
+            body: JSON.stringify({ name, email, password, role: "Student" })
         })
         const data = await res.json()
         if (!res.ok) {
@@ -30,8 +29,7 @@ function SignUp() {
         }
         localStorage.setItem("user", JSON.stringify(data))
 
-        if (role === "Student") navigate("/student/dashboard")
-        else if (role === "Admin") navigate("/admin/dashboard")
+        navigate("/student/dashboard")
     }
 
     return (
@@ -52,12 +50,6 @@ function SignUp() {
 
                 <label className="label">Password</label>
                 <input type="password" className="input" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-
-                <label className="label">Role</label>
-                <select className="select" value={role} onChange={e => setRole(e.target.value)}>
-                    <option>Student</option>
-                    <option>Admin</option>
-                </select>
 
                 <div className="tooltip mt-4" data-tip="Sign Up">
                     <button className="btn w-full" onClick={handleSignUp}>

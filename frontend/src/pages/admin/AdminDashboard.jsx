@@ -15,15 +15,12 @@ function AdminDashboard() {
         if (!storedUser) navigate("/")
         else if (storedUser.role != "Admin") navigate("/student/dashboard")
         else setUser(storedUser)
-    }, [])
+    }, [navigate])
 
     useEffect(() => {
         fetch("http://localhost:3001/courses")
             .then(res => res.json())
             .then(data => setCourses(data))
-        fetch("http://localhost:3001/admin-course-statistics")
-            .then(res => res.json())
-            .then(data => setStatistics(data))
     }, [])
 
     return (
